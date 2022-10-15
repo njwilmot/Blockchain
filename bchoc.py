@@ -15,6 +15,7 @@ class Block:
 class Blockchain:
     def __init__(self, head=None):
         self.head = head
+        
     def add(self, new_block): # adds a new block to the blockchain
         current = self.head
         if current:
@@ -23,12 +24,14 @@ class Blockchain:
             current.next = new_block
         else:
             self.head = new_block
+            
     def checkout(self, passed_item_id): # marks a block state as "CHECKED OUT"
         current = self.head
         while (current.next) and (current.item_id != passed_item_id):
             current = current.next
         if current.item_id == passed_item_id:
             current.state = "CHECKEDOUT"
+            
     def checkin(self, item_id): # marks a block state as "CHECKED IN"
         current = self.head
         while (current.next) and (current.item_id != passed_item_id):
