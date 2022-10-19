@@ -1,5 +1,4 @@
 bchoc: bchoc.py
-	cp bchoc.py bchoc
-	chmod +x bchoc
+	python3 bchoc.py
 clean:
 	rm bchoc
