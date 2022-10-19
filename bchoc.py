@@ -1,6 +1,7 @@
-from datetime import timezone
-import datetime
-import sys
+#!/usr/bin/python3
+
+from datetime import datetime,timezone
+import sys, os
 
 
 class Block:
@@ -66,36 +67,46 @@ class Blockchain:
 
 
 def main():
-    user_input = sys.argv
-    user_action = user_input[2]
-
-    blockchain = Blockchain()
-
-    match user_action:
-        case 'add':
-            # print("add")
-            case_id = user_input[4]
-            item_id = user_input[6]
-            time = maya.MayaDT.from_datetime(datetime.utcnow())
-            if blockchain.block_chain_size > 0:
-                block = Block(None, time, case_id, item_id, "CHECKEDIN", )
-            else:
-                block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-
-            blockchain.add(block)
-
-        case 'checkout':
-            print("add")
-        case 'checkin':
-            print("add")
-        case 'log':
-            print("log")
-        case 'remove':
-            print("remove")
-        case 'init':
-            print("init")
-        case 'verify':
-            print("verify")
+    cheese = True
+    while cheese:
+        try:
+            inp = input()
+            user_input = inp.split()
+            if len(user_input) > 0:
+                if user_input[0] == 'bchoc':
+                    blockchain = Blockchain()
+                    match user_input[1]:
+                        case 'add':
+                            case_id = user_input[3]
+                            item_id = user_input[5]
+                            time = datetime.now(timezone.utc)
+                            print(time)
+                            if blockchain.block_chain_size > 0:
+                                block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                            else:
+                                block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
+                            blockchain.add(block)
+                            # print(block.time)
+                        case 'checkout':
+                            print("add")
+                        case 'checkin':
+                            print("add")
+                        case 'log':
+                            print('log')
+                        case 'Remove':
+                            print("remove")
+                        case 'init':
+                            print("init")
+                        case 'verify':
+                            print("verify")
+                        case _:
+                            cheese = False
+                else:
+                    cheese = False
+        except EOFError:
+            cheese = False
+        except KeyboardInterrupt:
+            cheese = False
 
 
 if __name__ == "__main__":
