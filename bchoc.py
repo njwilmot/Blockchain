@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from datetime import datetime,timezone
+from datetime import datetime, timezone
 import sys, os
 
 
@@ -50,7 +50,11 @@ class Blockchain:
         if current.item_id == passed_item_id:
             current.state = "CHECKEDIN"
 
-    # def log():
+    def log(self):
+        log = self.head
+        while log is not None:
+            print(log.prev_hash, log.time_stamp, log.case_id, log.item_id, log.state, log.data_length, log.data)
+            log = log.next
 
     def remove(self, passed_item_id):  # removes a block
         current = self.head
@@ -79,20 +83,29 @@ def main():
                         case 'add':
                             case_id = user_input[3]
                             item_id = user_input[5]
-                            time = datetime.now(timezone.utc)
-                            print(time)
+                            time = datetime.now().isoformat()
+                            # print(time)
+                            # blockchain.head = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                            '''
                             if blockchain.block_chain_size > 0:
                                 block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
                             else:
                                 block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-                            blockchain.add(block)
-                            # print(block.time)
+                            '''
+                            #blockchain.add(block)
+
+                            if blockchain.block_chain_size > 0:
+                                blockchain.head = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                            # blockchain.add(block)
+                            blockchain.log()
+
+
                         case 'checkout':
                             print("add")
                         case 'checkin':
                             print("add")
                         case 'log':
-                            print('log')
+                            blockchain.log()
                         case 'Remove':
                             print("remove")
                         case 'init':
