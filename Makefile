@@ -1,5 +1,5 @@
-Project1: Project1.py
-	cp Project1.py Project1
-	chmod +x Project1
+bchoc: bchoc.py
+	cp bchoc.py bchoc
+	chmod +x bchoc
 clean:
-	rm Project1
+	rm bchoc
