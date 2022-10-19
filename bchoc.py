@@ -3,6 +3,8 @@
 from datetime import datetime, timezone
 import sys, os
 
+size = 0
+
 
 class Block:
     def __init__(self, prev_hash, time_stamp, case_id, item_id, state, data_length, data):
@@ -17,7 +19,6 @@ class Block:
 
 
 class Blockchain:
-    block_chain_size = 0
 
     def __init__(self, head=None):
         self.head = head
@@ -26,6 +27,8 @@ class Blockchain:
         return self.__sizeof__()
 
     def add(self, new_block):  # adds a new block to the blockchain
+        global size
+        size += 1
         current = self.head
         if current:
             while current.next:
@@ -33,8 +36,6 @@ class Blockchain:
             current.next = new_block
         else:
             self.head = new_block
-
-    block_chain_size += 1
 
     def checkout(self, passed_item_id):  # marks a block state as "CHECKED OUT"
         current = self.head
@@ -71,19 +72,20 @@ class Blockchain:
 
 
 def main():
+    global size
+    blockchain = Blockchain()
     cheese = True
     while cheese:
         try:
             inp = input()
             user_input = inp.split()
+            time = datetime.now().isoformat()
             if len(user_input) > 0:
                 if user_input[0] == 'bchoc':
-                    blockchain = Blockchain()
                     match user_input[1]:
                         case 'add':
                             case_id = user_input[3]
                             item_id = user_input[5]
-                            time = datetime.now().isoformat()
                             # print(time)
                             # blockchain.head = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
                             '''
@@ -93,12 +95,12 @@ def main():
                                 block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
                             '''
                             #blockchain.add(block)
-
-                            if blockchain.block_chain_size > 0:
-                                blockchain.head = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                            # blockchain.add(block)
-                            blockchain.log()
-
+                            if size > 0:
+                                list = []
+                                blockchain.add = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                blockchain.head.next = blockchain.add
+                            else:
+                                print("error")
 
                         case 'checkout':
                             print("add")
@@ -109,13 +111,18 @@ def main():
                         case 'Remove':
                             print("remove")
                         case 'init':
-                            print("init")
+                            if size > 0:
+                                print("Blockchain file found with INITIAL block.")
+                            else:
+                                blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
+                                print("Blockchain file not found. Created INITIAL block.")
+                                size += 1
                         case 'verify':
                             print("verify")
                         case _:
-                            cheese = False
+                            print("error")
                 else:
-                    cheese = False
+                    print("error")
         except EOFError:
             cheese = False
         except KeyboardInterrupt:
