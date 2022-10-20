@@ -20,6 +20,8 @@ class Block:
 
 class Blockchain:
 
+    tail = None
+
     def __init__(self, head=None):
         self.head = head
 
@@ -34,6 +36,7 @@ class Blockchain:
             while current.next:
                 current = current.next
             current.next = new_block
+            tail = new_block
         else:
             self.head = new_block
 
@@ -51,11 +54,20 @@ class Blockchain:
         if current.item_id == passed_item_id:
             current.state = "CHECKEDIN"
 
-    def log(self):
+    def forward_log(self):
         log = self.head
         while log is not None:
-            print(log.prev_hash, log.time_stamp, log.case_id, log.item_id, log.state, log.data_length, log.data)
+            print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
+                  "\nTime: " + str(log.time_stamp) + "\n")
             log = log.next
+
+    def reverse_log(self, log):
+        if log:
+            self.reverse_log(log.next)
+            print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
+                  "\nTime: " + str(log.time_stamp) + "\n")
+        else:
+            return
 
     def remove(self, passed_item_id):  # removes a block
         current = self.head
@@ -79,26 +91,18 @@ def main():
         try:
             inp = input()
             user_input = inp.split()
-            time = datetime.now().isoformat()
+            time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
             if len(user_input) > 0:
                 if user_input[0] == 'bchoc':
-                    match user_input[1]:
+                    match user_input[1]:  # fix will cause arr out of bounds error
                         case 'add':
                             case_id = user_input[3]
                             item_id = user_input[5]
-                            # print(time)
-                            # blockchain.head = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                            '''
-                            if blockchain.block_chain_size > 0:
-                                block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                            else:
-                                block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-                            '''
-                            #blockchain.add(block)
                             if size > 0:
-                                list = []
-                                blockchain.add = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                blockchain.head.next = blockchain.add
+                                new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                blockchain.add(new_block)
+                                # blockchain.add = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                # blockchain.head.next = blockchain.add
                             else:
                                 print("error")
 
@@ -107,7 +111,8 @@ def main():
                         case 'checkin':
                             print("add")
                         case 'log':
-                            blockchain.log()
+                            blockchain.forward_log()
+                            # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
                         case 'Remove':
                             print("remove")
                         case 'init':
@@ -123,6 +128,8 @@ def main():
                             print("error")
                 else:
                     print("error")
+            else:
+                print("No user input")
         except EOFError:
             cheese = False
         except KeyboardInterrupt:
