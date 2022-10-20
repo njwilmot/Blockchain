@@ -93,7 +93,7 @@ class Blockchain:
 def main():
     global size
     blockchain = Blockchain()
-    cheese = True
+    cheese = True  # Noah likes cheese
     while cheese:
         try:
             inp = input()
@@ -108,6 +108,20 @@ def main():
                             if size > 0:
                                 new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
                                 blockchain.add(new_block)
+                                more_items = True
+                                offset = 0
+                                while more_items:
+                                    try:
+                                        if user_input[6 + offset] == "-i":
+                                            item_id = user_input[7 + offset]
+                                            new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                            blockchain.add(new_block)
+                                            offset += 2
+                                    except IndexError:
+                                        more_items = False
+                                        pass
+                                    continue
+
                                 # blockchain.add = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
                                 # blockchain.head.next = blockchain.add
                             else:
