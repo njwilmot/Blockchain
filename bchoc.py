@@ -19,7 +19,6 @@ class Block:
 
 
 class Blockchain:
-
     tail = None
 
     def __init__(self, head=None):
@@ -40,28 +39,36 @@ class Blockchain:
         else:
             self.head = new_block
 
-    def checkout(self, passed_item_id):  # marks a block state as "CHECKED OUT"
+    def checkout(self, passed_item_id):  # checks out a block item and marks its state as "CHECKED OUT"
         current = self.head
         while current.next and (current.item_id != passed_item_id):
             current = current.next
-        if current.item_id == passed_item_id:
+        if current.item_id == passed_item_id and current.state == "CHECKEDIN":
             current.state = "CHECKEDOUT"
+            checkout_time = datetime.now(timezone.utc).isoformat()
+            print("Case: " + current.case_id + "\nChecked out item: " + current.item_id + "\n\tStatus: " + current.state
+                  + "\n\tTime of action: " + checkout_time)
+        elif current.state == "CHECKEDOUT":
+            print("Error: Cannot check out a checked out item. Must check it in first.")
 
-    def checkin(self, passed_item_id):  # marks a block state as "CHECKED IN"
+    def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
         current = self.head
         while current.next and (current.item_id != passed_item_id):
             current = current.next
-        if current.item_id == passed_item_id:
+        if current.item_id == passed_item_id and current.state == "CHECKEDOUT":
             current.state = "CHECKEDIN"
+            checkin_time = datetime.now(timezone.utc).isoformat()
+            print("Case: " + current.case_id + "\nChecked in item: " + current.item_id + "\n\tStatus: " + current.state
+                  + "\n\tTime of action: " + checkin_time)
 
-    def forward_log(self):
+    def forward_log(self):  # prints Blockchain
         log = self.head
         while log is not None:
             print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
                   "\nTime: " + str(log.time_stamp) + "\n")
             log = log.next
 
-    def reverse_log(self, log):
+    def reverse_log(self, log):  # prints Blockchain in reverse
         if log:
             self.reverse_log(log.next)
             print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
@@ -107,9 +114,18 @@ def main():
                                 print("error")
 
                         case 'checkout':
-                            print("add")
+                            if user_input[2] == "-i":
+                                item = user_input[3]
+                                blockchain.checkout(item)
+                            else:
+                                print("error")
                         case 'checkin':
-                            print("add")
+                            if user_input[2] == "-i":
+                                item = user_input[3]
+                                blockchain.checkin(item)
+                            else:
+                                print("error")
+
                         case 'log':
                             blockchain.forward_log()
                             # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
