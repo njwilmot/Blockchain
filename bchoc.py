@@ -1,7 +1,11 @@
-from datetime import timezone
-import datetime
-import sys
+#!/usr/bin/python3
 
+import os
+import sys
+import re
+from collections import Counter
+from datetime import datetime, timezone
+size = 0
 
 class Block:
     def __init__(self, prev_hash, time_stamp, case_id, item_id, state, data_length, data):
@@ -16,7 +20,7 @@ class Block:
 
 
 class Blockchain:
-    block_chain_size = 0
+    tail = None
 
     def __init__(self, head=None):
         self.head = head
@@ -25,6 +29,8 @@ class Blockchain:
         return self.__sizeof__()
 
     def add(self, new_block):  # adds a new block to the blockchain
+        global size
+        size += 1
         current = self.head
         if current:
             while current.next:
@@ -32,8 +38,6 @@ class Blockchain:
             current.next = new_block
         else:
             self.head = new_block
-
-    block_chain_size += 1
 
     def checkout(self, passed_item_id):  # marks a block state as "CHECKED OUT"
         current = self.head
@@ -49,7 +53,49 @@ class Blockchain:
         if current.item_id == passed_item_id:
             current.state = "CHECKEDIN"
 
-    # def log():
+    def forward_log(self):
+        log = self.head
+        blocks = []
+        items = []
+        while log is not None:
+            block = []
+            if log.item_id is None:
+                print("\nCase: " + str(log.case_id))
+                print("\tAdded item: " + str(log.item_id) + "\n\tAction: " + str(log.state) +
+                      "\n\tTime: " + str(log.time_stamp) + "\n")
+
+            if log.item_id is not None:
+                block.append(str(log.case_id))
+                block.append(str(log.state))
+                block.append(str(log.time_stamp))
+
+                for item in log.item_id:
+                    block.append(str(item))
+                    items.append(str(item))
+            if len(block) > 0:
+                blocks.append(block)
+            log = log.next
+
+        case_IDs = []
+        for i in blocks:
+            case_IDs.append(i[0])
+        non_duplicates = list(dict.fromkeys(case_IDs))
+
+        for unique in non_duplicates:
+            print("\nCase: " + str(unique))
+            for nodes in blocks:
+                if unique == nodes[0]:
+                    for it in nodes[3:]:
+                        print("\tAdded item: " + str(it) + "\n\tAction: " + str(nodes[1]) + "\n\tTime: " + str(nodes[2]) + "\n")
+
+
+    def reverse_log(self, log):
+        if log:
+            self.reverse_log(log.next)
+            print("\nCase: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
+                  "\nTime: " + str(log.time_stamp))
+        else:
+            return
 
     def remove(self, passed_item_id):  # removes a block
         current = self.head
@@ -66,36 +112,67 @@ class Blockchain:
 
 
 def main():
-    user_input = sys.argv
-    user_action = user_input[2]
-
+    global size
+    global case_list
     blockchain = Blockchain()
+    cheese = True
+    while cheese:
+        try:
+            inp = input("\n")
+            user_input = inp.split()
+            time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
+            if len(user_input) > 1:
+                if user_input[0] == 'bchoc':
+                    match user_input[1]:  # fix will cause arr out of bounds error
+                        case 'add':
 
-    match user_action:
-        case 'add':
-            # print("add")
-            case_id = user_input[4]
-            item_id = user_input[6]
-            time = maya.MayaDT.from_datetime(datetime.utcnow())
-            if blockchain.block_chain_size > 0:
-                block = Block(None, time, case_id, item_id, "CHECKEDIN", )
+                            indices = []
+                            for idx, value in enumerate(user_input):
+                                if value == '-i':
+                                    indices.append(idx)
+
+                            item_ids = []
+                            for i in indices:
+                                item_ids.append(user_input[i + 1])
+
+                            cid = user_input.index('-c')
+                            case_id = user_input[cid + 1]
+
+                            # item_id = user_input[i_id_list]
+                            if size > 0:
+                                new_block = Block(None, time, case_id, item_ids, "CHECKEDIN", None, None)
+                                blockchain.add(new_block)
+                            else:
+                                print("bchoc init first")
+
+                        case 'checkout':
+                            print("add")
+                        case 'checkin':
+                            print("add")
+                        case 'log':
+                            blockchain.forward_log()
+                            # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
+                        case 'Remove':
+                            print("remove")
+                        case 'init':
+                            if size > 0:
+                                print("Blockchain file found with INITIAL block.")
+                            else:
+                                blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
+                                print("Blockchain file not found. Created INITIAL block.")
+                                size += 1
+                        case 'verify':
+                            print("verify")
+                        case _:
+                            print("default error")
+                else:
+                    print("enter bchoc first")
             else:
-                block = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-
-            blockchain.add(block)
-
-        case 'checkout':
-            print("add")
-        case 'checkin':
-            print("add")
-        case 'log':
-            print("log")
-        case 'remove':
-            print("remove")
-        case 'init':
-            print("init")
-        case 'verify':
-            print("verify")
+                print("No user input")
+        except EOFError:
+            cheese = False
+        except KeyboardInterrupt:
+            cheese = False
 
 
 if __name__ == "__main__":
