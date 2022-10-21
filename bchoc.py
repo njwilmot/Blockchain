@@ -54,16 +54,43 @@ class Blockchain:
             current.state = "CHECKEDIN"
 
     def forward_log(self):
+
         log = self.head
         blocks = []
         items = []
         while log is not None:
             block = []
-            if log.item_id is None:
-                print("\nCase: " + str(log.case_id))
-                print("\tAdded item: " + str(log.item_id) + "\n\tAction: " + str(log.state) +
-                      "\n\tTime: " + str(log.time_stamp) + "\n")
+            if log.item_id is not None:
+                block.append(str(log.case_id))
+                block.append(str(log.state))
+                block.append(str(log.time_stamp))
 
+                for item in log.item_id:
+                    block.append(str(item))
+                    items.append(str(item))
+            if len(block) > 0:
+                blocks.append(block)
+            log = log.next
+
+        case_IDs = []
+        for i in blocks:
+            case_IDs.append(i[0])
+        non_duplicates = list(dict.fromkeys(case_IDs))
+        # num = item
+
+        for unique in non_duplicates:
+            for nodes in reversed(blocks):
+                if unique == nodes[0]:
+                    for it in reversed(nodes[3:]):
+                        print("\nCase: " + str(unique))
+                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
+
+    def print_add_log(self):
+        log = self.head
+        blocks = []
+        items = []
+        while log is not None:
+            block = []
             if log.item_id is not None:
                 block.append(str(log.case_id))
                 block.append(str(log.state))
@@ -82,20 +109,43 @@ class Blockchain:
         non_duplicates = list(dict.fromkeys(case_IDs))
 
         for unique in non_duplicates:
-            print("\nCase: " + str(unique))
+            for nodes in reversed(blocks):
+                print("\nCase: " + str(unique))
+                if unique == nodes[0]:
+                    for it in nodes[3:]:
+                        print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(nodes[2]) + "\n")
+                break
+
+    def reverse_log(self):
+
+        log = self.head
+        blocks = []
+        items = []
+        while log is not None:
+            block = []
+            if log.item_id is not None:
+                block.append(str(log.case_id))
+                block.append(str(log.state))
+                block.append(str(log.time_stamp))
+
+                for item in log.item_id:
+                    block.append(str(item))
+                    items.append(str(item))
+            if len(block) > 0:
+                blocks.append(block)
+            log = log.next
+
+        case_IDs = []
+        for i in blocks:
+            case_IDs.append(i[0])
+        non_duplicates = list(dict.fromkeys(case_IDs))
+
+        for unique in non_duplicates:
             for nodes in blocks:
                 if unique == nodes[0]:
                     for it in nodes[3:]:
-                        print("\tAdded item: " + str(it) + "\n\tAction: " + str(nodes[1]) + "\n\tTime: " + str(nodes[2]) + "\n")
-
-
-    def reverse_log(self, log):
-        if log:
-            self.reverse_log(log.next)
-            print("\nCase: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
-                  "\nTime: " + str(log.time_stamp))
-        else:
-            return
+                        print("\nCase: " + str(unique))
+                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
 
     def remove(self, passed_item_id):  # removes a block
         current = self.head
@@ -113,12 +163,12 @@ class Blockchain:
 
 def main():
     global size
-    global case_list
+
     blockchain = Blockchain()
     cheese = True
     while cheese:
         try:
-            inp = input("\n")
+            inp = input()
             user_input = inp.split()
             time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
             if len(user_input) > 1:
@@ -142,6 +192,7 @@ def main():
                             if size > 0:
                                 new_block = Block(None, time, case_id, item_ids, "CHECKEDIN", None, None)
                                 blockchain.add(new_block)
+                                blockchain.print_add_log()
                             else:
                                 print("bchoc init first")
 
@@ -150,16 +201,24 @@ def main():
                         case 'checkin':
                             print("add")
                         case 'log':
-                            blockchain.forward_log()
+                            case_id = ''
+                            entries_id = ''
+                            item_id = ''
+                            if len(user_input) > 2:
+                                for i in user_input[2:]:
+                                    if i == '-r':
+                                        blockchain.reverse_log()
+                            else:
+                                blockchain.forward_log()
                             # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
                         case 'Remove':
                             print("remove")
                         case 'init':
                             if size > 0:
-                                print("Blockchain file found with INITIAL block.")
+                                print("\nBlockchain file found with INITIAL block.")
                             else:
                                 blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-                                print("Blockchain file not found. Created INITIAL block.")
+                                print("\nBlockchain file not found. Created INITIAL block.")
                                 size += 1
                         case 'verify':
                             print("verify")
