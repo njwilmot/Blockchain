@@ -53,7 +53,7 @@ class Blockchain:
         if current.item_id == passed_item_id:
             current.state = "CHECKEDIN"
 
-    def forward_log(self):
+    def reverse_log(self):
 
         log = self.head
         blocks = []
@@ -82,9 +82,40 @@ class Blockchain:
             for nodes in reversed(blocks):
                 if unique == nodes[0]:
                     for it in reversed(nodes[3:]):
-                        print("\nCase: " + str(unique))
+                        print("Case: " + str(unique))
                         print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
 
+    def forward_log(self):
+
+        log = self.head
+        blocks = []
+        items = []
+        while log is not None:
+            block = []
+            if log.item_id is not None:
+                block.append(str(log.case_id))
+                block.append(str(log.state))
+                block.append(str(log.time_stamp))
+
+                for item in log.item_id:
+                    block.append(str(item))
+                    items.append(str(item))
+            if len(block) > 0:
+                blocks.append(block)
+            log = log.next
+
+        case_IDs = []
+        for i in blocks:
+            case_IDs.append(i[0])
+        non_duplicates = list(dict.fromkeys(case_IDs))
+
+        for unique in non_duplicates:
+            for nodes in blocks:
+                if unique == nodes[0]:
+                    for it in nodes[3:]:
+                        print("Case: " + str(unique))
+                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
+                        
     def print_add_log(self):
         log = self.head
         blocks = []
@@ -113,39 +144,8 @@ class Blockchain:
                 print("\nCase: " + str(unique))
                 if unique == nodes[0]:
                     for it in nodes[3:]:
-                        print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(nodes[2]) + "\n")
+                        print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(nodes[2]))
                 break
-
-    def reverse_log(self):
-
-        log = self.head
-        blocks = []
-        items = []
-        while log is not None:
-            block = []
-            if log.item_id is not None:
-                block.append(str(log.case_id))
-                block.append(str(log.state))
-                block.append(str(log.time_stamp))
-
-                for item in log.item_id:
-                    block.append(str(item))
-                    items.append(str(item))
-            if len(block) > 0:
-                blocks.append(block)
-            log = log.next
-
-        case_IDs = []
-        for i in blocks:
-            case_IDs.append(i[0])
-        non_duplicates = list(dict.fromkeys(case_IDs))
-
-        for unique in non_duplicates:
-            for nodes in blocks:
-                if unique == nodes[0]:
-                    for it in nodes[3:]:
-                        print("\nCase: " + str(unique))
-                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
 
     def remove(self, passed_item_id):  # removes a block
         current = self.head
@@ -168,7 +168,7 @@ def main():
     cheese = True
     while cheese:
         try:
-            inp = input()
+            inp = input("\n")
             user_input = inp.split()
             time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
             if len(user_input) > 1:
