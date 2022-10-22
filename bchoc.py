@@ -5,7 +5,9 @@ import sys
 import re
 from collections import Counter
 from datetime import datetime, timezone
+
 size = 0
+
 
 class Block:
     def __init__(self, prev_hash, time_stamp, case_id, item_id, state, data_length, data):
@@ -43,15 +45,23 @@ class Blockchain:
         current = self.head
         while current.next and (current.item_id != passed_item_id):
             current = current.next
-        if current.item_id == passed_item_id:
+        if current.item_id[0] == passed_item_id and current.state == 'CHECKEDIN':
             current.state = "CHECKEDOUT"
+            checkout_time = datetime.now(timezone.utc).isoformat()
+            print("\nCase: " + current.case_id + "\nChecked out item: " + current.item_id[0] + "\n\tStatus: " + current.state
+                  + "\n\tTime of action: " + checkout_time)
+        elif current.state == "CHECKEDOUT":
+            print("Error: Cannot check out a checked out item. Must check it in first.")
 
     def checkin(self, passed_item_id):  # marks a block state as "CHECKED IN"
         current = self.head
         while current.next and (current.item_id != passed_item_id):
             current = current.next
-        if current.item_id == passed_item_id:
+        if current.item_id[0] == passed_item_id and current.state == 'CHECKEDOUT':
             current.state = "CHECKEDIN"
+            checkin_time = datetime.now(timezone.utc).isoformat()
+            print("\nCase: " + current.case_id + "\nChecked in item: " + current.item_id[0] + "\n\tStatus: " + current.state
+                  + "\n\tTime of action: " + checkin_time)
 
     def reverse_log(self):
 
@@ -82,8 +92,8 @@ class Blockchain:
             for nodes in reversed(blocks):
                 if unique == nodes[0]:
                     for it in reversed(nodes[3:]):
-                        print("Case: " + str(unique))
-                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
+                        print("\nCase: " + str(unique))
+                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]))
 
     def forward_log(self):
 
@@ -113,9 +123,9 @@ class Blockchain:
             for nodes in blocks:
                 if unique == nodes[0]:
                     for it in nodes[3:]:
-                        print("Case: " + str(unique))
-                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]) + "\n")
-                        
+                        print("\nCase: " + str(unique))
+                        print("Item: " + str(it) + "\nAction: " + str(nodes[1]) + "\nTime: " + str(nodes[2]))
+
     def print_add_log(self):
         log = self.head
         blocks = []
@@ -144,7 +154,8 @@ class Blockchain:
                 print("\nCase: " + str(unique))
                 if unique == nodes[0]:
                     for it in nodes[3:]:
-                        print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(nodes[2]))
+                        print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(
+                            nodes[2]))
                 break
 
     def remove(self, passed_item_id):  # removes a block
@@ -168,14 +179,13 @@ def main():
     cheese = True
     while cheese:
         try:
-            inp = input("\n")
+            inp = input('\n')
             user_input = inp.split()
             time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
             if len(user_input) > 1:
                 if user_input[0] == 'bchoc':
                     match user_input[1]:  # fix will cause arr out of bounds error
                         case 'add':
-
                             indices = []
                             for idx, value in enumerate(user_input):
                                 if value == '-i':
@@ -194,16 +204,22 @@ def main():
                                 blockchain.add(new_block)
                                 blockchain.print_add_log()
                             else:
-                                print("bchoc init first")
+                                print("did not init")
 
                         case 'checkout':
-                            print("add")
+                            if user_input[2] == "-i":
+                                item = user_input[3]
+                                blockchain.checkout(item)
+                            else:
+                                print("error")
                         case 'checkin':
-                            print("add")
+                            if user_input[1] == 'checkin' and user_input[2] == "-i":
+                                item = user_input[3]
+                                blockchain.checkin(item)
+                            else:
+                                print("error")
                         case 'log':
-                            case_id = ''
-                            entries_id = ''
-                            item_id = ''
+
                             if len(user_input) > 2:
                                 for i in user_input[2:]:
                                     if i == '-r':
@@ -215,10 +231,10 @@ def main():
                             print("remove")
                         case 'init':
                             if size > 0:
-                                print("\nBlockchain file found with INITIAL block.")
+                                print("Blockchain file found with INITIAL block.")
                             else:
                                 blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-                                print("\nBlockchain file not found. Created INITIAL block.")
+                                print("Blockchain file not found. Created INITIAL block.")
                                 size += 1
                         case 'verify':
                             print("verify")
