@@ -151,8 +151,8 @@ class Blockchain:
 
         for unique in non_duplicates:
             for nodes in reversed(blocks):
-                print("\nCase: " + str(unique))
                 if unique == nodes[0]:
+                    print("\nCase: " + str(nodes[0]))
                     for it in nodes[3:]:
                         print("Added item: " + str(it) + "\n  Status: " + str(nodes[1]) + "\n  Time of action: " + str(
                             nodes[2]))
@@ -231,10 +231,10 @@ def main():
                             print("remove")
                         case 'init':
                             if size > 0:
-                                print("Blockchain file found with INITIAL block.")
+                                print("\nBlockchain file found with INITIAL block.")
                             else:
                                 blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
-                                print("Blockchain file not found. Created INITIAL block.")
+                                print("\nBlockchain file not found. Created INITIAL block.")
                                 size += 1
                         case 'verify':
                             print("verify")
