@@ -61,14 +61,20 @@ class Blockchain:
             print("Case: " + current.case_id + "\nChecked in item: " + current.item_id + "\n\tStatus: " + current.state
                   + "\n\tTime of action: " + checkin_time)
 
-    def forward_log(self):  # prints Blockchain
+    def forward_log(self, num_entries):  # prints Blockchain
         log = self.head
-        while log is not None:
-            print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
-                  "\nTime: " + str(log.time_stamp) + "\n")
-            log = log.next
+        if num_entries == -1:
+            while log is not None:
+                print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
+                      "\nTime: " + str(log.time_stamp) + "\n")
+                log = log.next
+        else:
+            for x in range(num_entries):
+                print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
+                      "\nTime: " + str(log.time_stamp) + "\n")
+                log = log.next
 
-    def reverse_log(self, log):  # prints Blockchain in reverse
+    def reverse_log(self, log, num_entries):  # prints Blockchain in reverse
         if log:
             self.reverse_log(log.next)
             print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
@@ -121,9 +127,6 @@ def main():
                                         more_items = False
                                         pass
                                     continue
-
-                                # blockchain.add = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                # blockchain.head.next = blockchain.add
                             else:
                                 print("error")
 
