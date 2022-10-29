@@ -146,26 +146,30 @@ def main():
                             try:
                                 case_id = user_input[3]
                                 item_id = user_input[5]
-                                if size > 0:
-                                    new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                    blockchain.add(new_block)
-                                    more_items = True
-                                    offset = 0
-                                    while more_items:
-                                        try:
-                                            if user_input[6 + offset] == "-i":
-                                                item_id = user_input[7 + offset]
-                                                new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                                blockchain.add(new_block)
-                                                offset += 2
-                                        except IndexError:
-                                            more_items = False
-                                            pass
-                                        continue
-                                else:
-                                    print("error")
+                                search = blockchain.find_bchoc_item(item_id)
+                                if search.state == "DNE":
+                                    if size > 0:
+                                        new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                        blockchain.add(new_block)
+                                        more_items = True
+                                        offset = 0
+                                        while more_items:
+                                            try:
+                                                if user_input[6 + offset] == "-i":
+                                                    item_id = user_input[7 + offset]
+                                                    new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                                    blockchain.add(new_block)
+                                                    offset += 2
+                                            except IndexError:
+                                                more_items = False
+                                                pass
+                                            continue
+                                    else:
+                                        print("error")
+                                elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED":
+                                    exit(1)
                             except IndexError:
-                                print("Error, must specify case id and item id")
+                                exit(1)
                                 pass
                             continue
 
@@ -175,12 +179,14 @@ def main():
                                 blockchain.checkout(item)
                             else:
                                 print("Checkout Error")
+                                exit(1)
                         case 'checkin':
                             if user_input[2] == "-i":
                                 item = user_input[3]
                                 blockchain.checkin(item)
                             else:
                                 print("Checkin Error")
+                                exit(1)
 
                         case 'log':
                             blockchain.forward_log(-1)
@@ -201,8 +207,10 @@ def main():
                                     continue
                                 else:
                                     print("Error, reason not given for removal")
+                                    exit(1)
                             else:
                                 print("Error, no item given for removal")
+                                exit(1)
 
                         case 'init':
                             if size > 0:
@@ -215,10 +223,13 @@ def main():
                             print("verify")
                         case _:
                             print("error")
+                            exit(1)
                 else:
                     print("error")
+                    exit(1)
             else:
                 print("No user input")
+                exit(1)
         except EOFError:
             cheese = False
         except KeyboardInterrupt:
