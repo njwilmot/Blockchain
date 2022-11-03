@@ -177,12 +177,11 @@ def main():
     user_input = inp.split()
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
-        if user_input[0] == 'bchoc':
-            match user_input[1]:  # fix will cause arr out of bounds error
+            match user_input[0]:  # fix will cause arr out of bounds error
                 case 'add':
                     try:
-                        case_id = user_input[3]
-                        item_id = user_input[5]
+                        case_id = user_input[2]
+                        item_id = user_input[4]
                         search = blockchain.find_bchoc_item(item_id)
                         if search.state == "DNE":
                             if size > 0:
@@ -192,8 +191,8 @@ def main():
                                 offset = 0
                                 while more_items:
                                     try:
-                                        if user_input[6 + offset] == "-i":
-                                            item_id = user_input[7 + offset]
+                                        if user_input[5 + offset] == "-i":
+                                            item_id = user_input[6 + offset]
                                             new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
                                             blockchain.add(new_block)
                                             offset += 2
@@ -214,8 +213,8 @@ def main():
                     blockchain_file.close()
 
                 case 'checkout':
-                    if user_input[2] == "-i":
-                        item = user_input[3]
+                    if user_input[1] == "-i":
+                        item = user_input[2]
                         blockchain.checkout(item)
                         blockchain_file = open('blockchain.txt', 'w')
                         blockchain.write_blockchain(blockchain_file)
@@ -224,8 +223,8 @@ def main():
                         print("Checkout Error")
                         exit(1)
                 case 'checkin':
-                    if user_input[2] == "-i":
-                        item = user_input[3]
+                    if user_input[1] == "-i":
+                        item = user_input[2]
                         blockchain.checkin(item)
                         blockchain_file = open('blockchain.txt', 'w')
                         blockchain.write_blockchain(blockchain_file)
@@ -238,13 +237,13 @@ def main():
                     blockchain.forward_log(-1)
                     # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
                 case 'remove':
-                    if user_input[2] == '-i':
-                        item_id = user_input[3]
-                        if user_input[4] == "-y":
-                            reason = user_input[5]
+                    if user_input[1] == '-i':
+                        item_id = user_input[2]
+                        if user_input[3] == "-y":
+                            reason = user_input[4]
                             try:
-                                if user_input[6] == "-o":
-                                    info = " ".join(user_input[7:])
+                                if user_input[5] == "-o":
+                                    info = " ".join(user_input[6:])
                                     blockchain.remove(item_id, reason, info)
                                     blockchain_file = open('blockchain.txt', 'w')
                                     blockchain.write_blockchain(blockchain_file)
@@ -279,9 +278,6 @@ def main():
                 case _:
                     print("error")
                     exit(1)
-        else:
-            print("error")
-            exit(1)
     else:
         print("No user input")
         exit(1)
