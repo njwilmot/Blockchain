@@ -172,115 +172,121 @@ def main():
 
     # cheese = True  # Noah likes cheese
     # while cheese:
-
-    inp = input()
-    user_input = inp.split()
-    time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
-    if len(user_input) > 0:
-            match user_input[0]:  # fix will cause arr out of bounds error
-                case 'add':
-                    try:
-                        case_id = user_input[2]
-                        item_id = user_input[4]
-                        search = blockchain.find_bchoc_item(item_id)
-                        if search.state == "DNE":
-                            if size > 0:
-                                new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                blockchain.add(new_block)
-                                more_items = True
-                                offset = 0
-                                while more_items:
-                                    try:
-                                        if user_input[5 + offset] == "-i":
-                                            item_id = user_input[6 + offset]
-                                            new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                            blockchain.add(new_block)
-                                            offset += 2
-                                    except IndexError:
-                                        more_items = False
-                                        pass
-                                    continue
-                            else:
-                                print("error")
-                        elif search.state == "RELEASED" or search.state == "DISPOSED" or \
-                                search.state == "DESTROYED":
-                            exit(1)
-                    except IndexError:
-                        exit(1)
-                        pass
-                    blockchain_file = open('blockchain.txt', 'w')
-                    blockchain.write_blockchain(blockchain_file)
-                    blockchain_file.close()
-
-                case 'checkout':
-                    if user_input[1] == "-i":
-                        item = user_input[2]
-                        blockchain.checkout(item)
-                        blockchain_file = open('blockchain.txt', 'w')
-                        blockchain.write_blockchain(blockchain_file)
-                        blockchain_file.close()
-                    else:
-                        print("Checkout Error")
-                        exit(1)
-                case 'checkin':
-                    if user_input[1] == "-i":
-                        item = user_input[2]
-                        blockchain.checkin(item)
-                        blockchain_file = open('blockchain.txt', 'w')
-                        blockchain.write_blockchain(blockchain_file)
-                        blockchain_file.close()
-                    else:
-                        print("Checkin Error")
-                        exit(1)
-
-                case 'log':
-                    blockchain.forward_log(-1)
-                    # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
-                case 'remove':
-                    if user_input[1] == '-i':
-                        item_id = user_input[2]
-                        if user_input[3] == "-y":
-                            reason = user_input[4]
-                            try:
-                                if user_input[5] == "-o":
-                                    info = " ".join(user_input[6:])
-                                    blockchain.remove(item_id, reason, info)
-                                    blockchain_file = open('blockchain.txt', 'w')
-                                    blockchain.write_blockchain(blockchain_file)
-                                    blockchain_file.close()
+    cheese = True
+    while cheese:
+        try:
+            inp = input()
+            user_input = inp.split()
+            time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
+            if len(user_input) > 0:
+                match user_input[0]:  # fix will cause arr out of bounds error
+                    case 'add':
+                        try:
+                            case_id = user_input[2]
+                            item_id = user_input[4]
+                            search = blockchain.find_bchoc_item(item_id)
+                            if search.state == "DNE":
+                                if size > 0:
+                                    new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                    blockchain.add(new_block)
+                                    more_items = True
+                                    offset = 0
+                                    while more_items:
+                                        try:
+                                            if user_input[5 + offset] == "-i":
+                                                item_id = user_input[6 + offset]
+                                                new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                                blockchain.add(new_block)
+                                                offset += 2
+                                        except IndexError:
+                                            more_items = False
+                                            pass
+                                        continue
                                 else:
-                                    blockchain.remove(item_id, reason, "NONE")
-                                    blockchain_file = open('blockchain.txt', 'w')
-                                    blockchain.write_blockchain(blockchain_file)
-                                    blockchain_file.close()
-                            except IndexError:
-                                pass
-                        else:
-                            print("Error, reason not given for removal")
+                                    print("error")
+                            elif search.state == "RELEASED" or search.state == "DISPOSED" or \
+                                    search.state == "DESTROYED":
+                                exit(1)
+                        except IndexError:
                             exit(1)
-                    else:
-                        print("Error, no item given for removal")
-                        exit(1)
-
-                case 'init':
-                    if size > 0:
-                        print("Blockchain file found with INITIAL block.")
-                    else:
-                        blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
-                        size += 1
+                            pass
                         blockchain_file = open('blockchain.txt', 'w')
                         blockchain.write_blockchain(blockchain_file)
                         blockchain_file.close()
-                        print("Blockchain file not found. Created INITIAL block.")
-                        size += 1
-                case 'verify':
-                    print("verify")
-                case _:
-                    print("error")
-                    exit(1)
-    else:
-        print("No user input")
-        exit(1)
+
+                    case 'checkout':
+                        if user_input[1] == "-i":
+                            item = user_input[2]
+                            blockchain.checkout(item)
+                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain.write_blockchain(blockchain_file)
+                            blockchain_file.close()
+                        else:
+                            print("Checkout Error")
+                            exit(1)
+                    case 'checkin':
+                        if user_input[1] == "-i":
+                            item = user_input[2]
+                            blockchain.checkin(item)
+                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain.write_blockchain(blockchain_file)
+                            blockchain_file.close()
+                        else:
+                            print("Checkin Error")
+                            exit(1)
+
+                    case 'log':
+                        blockchain.forward_log(-1)
+                        # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
+                    case 'remove':
+                        if user_input[1] == '-i':
+                            item_id = user_input[2]
+                            if user_input[3] == "-y":
+                                reason = user_input[4]
+                                try:
+                                    if user_input[5] == "-o":
+                                        info = " ".join(user_input[6:])
+                                        blockchain.remove(item_id, reason, info)
+                                        blockchain_file = open('blockchain.txt', 'w')
+                                        blockchain.write_blockchain(blockchain_file)
+                                        blockchain_file.close()
+                                    else:
+                                        blockchain.remove(item_id, reason, "NONE")
+                                        blockchain_file = open('blockchain.txt', 'w')
+                                        blockchain.write_blockchain(blockchain_file)
+                                        blockchain_file.close()
+                                except IndexError:
+                                    pass
+                            else:
+                                print("Error, reason not given for removal")
+                                exit(1)
+                        else:
+                            print("Error, no item given for removal")
+                            exit(1)
+
+                    case 'init':
+                        if size > 0:
+                            print("Blockchain file found with INITIAL block.")
+                        else:
+                            blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
+                            size += 1
+                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain.write_blockchain(blockchain_file)
+                            blockchain_file.close()
+                            print("Blockchain file not found. Created INITIAL block.")
+                            size += 1
+                    case 'verify':
+                        print("verify")
+                    case _:
+                        print("error")
+                        exit(1)
+            else:
+                print("No user input")
+                exit(1)
+        except EOFError:
+            cheese = False
+        except KeyboardInterrupt:
+            cheese = False
 
 
 if __name__ == "__main__":
