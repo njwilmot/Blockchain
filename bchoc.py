@@ -180,41 +180,49 @@ def main():
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
-                try:
-                    case_id = user_input[2]
-                    item_id = user_input[4]
-                    search = blockchain.find_bchoc_item(item_id)
-                    if search.state == "DNE":
-                        if size > 0:
-                            new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                            print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
-                                  "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
-                            blockchain.add(new_block)
-                            more_items = True
-                            offset = 0
-                            while more_items:
-                                try:
-                                    if user_input[5 + offset] == "-i":
-                                        item_id = user_input[6 + offset]
-                                        new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
-                                        print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
-                                              "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
-                                        blockchain.add(new_block)
-                                        offset += 2
-                                except IndexError:
-                                    more_items = False
-                                    pass
-                                continue
-                        else:
-                            print("error")
-                    elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED" or "CHECKEDIN" or "CHECKEDOUT":
+                if blockchain.head:
+                    try:
+                        case_id = user_input[2]
+                        item_id = user_input[4]
+                        search = blockchain.find_bchoc_item(item_id)
+                        if search.state == "DNE":
+                            if size > 0:
+                                new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                      "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
+                                blockchain.add(new_block)
+                                more_items = True
+                                offset = 0
+                                while more_items:
+                                    try:
+                                        if user_input[5 + offset] == "-i":
+                                            item_id = user_input[6 + offset]
+                                            new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                            print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                                  "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
+                                            blockchain.add(new_block)
+                                            offset += 2
+                                    except IndexError:
+                                        more_items = False
+                                        pass
+                                    continue
+                            else:
+                                print("error")
+                        elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED" or "CHECKEDIN" or "CHECKEDOUT":
+                            exit(1)
+                    except IndexError:
                         exit(1)
-                except IndexError:
-                    exit(1)
-                    pass
-                blockchain_file = open('blockchain.txt', 'w')
-                blockchain.write_blockchain(blockchain_file)
-                blockchain_file.close()
+                        pass
+                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain.write_blockchain(blockchain_file)
+                    blockchain_file.close()
+                else:
+                    blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
+                    size += 1
+                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain.write_blockchain(blockchain_file)
+                    blockchain_file.close()
+                    print("Blockchain file not found. Created INITIAL block.")
 
             case 'checkout':
                 if user_input[1] == "-i":
@@ -275,7 +283,6 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
-                    size += 1
             case 'verify':
                 print("verify")
             case _:
