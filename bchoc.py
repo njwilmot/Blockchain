@@ -172,7 +172,9 @@ def main():
 
     # cheese = True  # Noah likes cheese
     # while cheese:
-    user_input = sys.argv[1:]
+
+    inp = input()
+    user_input = inp.split()
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
@@ -184,6 +186,8 @@ def main():
                     if search.state == "DNE":
                         if size > 0:
                             new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                            print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                  "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
                             blockchain.add(new_block)
                             more_items = True
                             offset = 0
@@ -192,6 +196,8 @@ def main():
                                     if user_input[5 + offset] == "-i":
                                         item_id = user_input[6 + offset]
                                         new_block = Block(None, time, case_id, item_id, "CHECKEDIN", None, None)
+                                        print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                              "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
                                         blockchain.add(new_block)
                                         offset += 2
                                 except IndexError:
