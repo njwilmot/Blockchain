@@ -137,7 +137,7 @@ class Blockchain:
             if owner_info != 'NONE':
                 curr_time = datetime.now(timezone.utc).isoformat()
                 item = self.find_bchoc_item(passed_item_id)
-                item.state = "RELEASED"
+                item.state = reason
                 print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
                       "\n\tOwner info: " + owner_info + "\n\tTime of action: " + curr_time)
             else:
@@ -145,7 +145,7 @@ class Blockchain:
         else:
             curr_time = datetime.now(timezone.utc).isoformat()
             item = self.find_bchoc_item(passed_item_id)
-            item.state = "RELEASED"
+            item.state = reason
             print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
                   "\n\tTime of action: " + curr_time)
 
@@ -253,12 +253,11 @@ def main():
                                 blockchain_file = open('blockchain.txt', 'w')
                                 blockchain.write_blockchain(blockchain_file)
                                 blockchain_file.close()
-                            else:
-                                blockchain.remove(item_id, reason, "NONE")
-                                blockchain_file = open('blockchain.txt', 'w')
-                                blockchain.write_blockchain(blockchain_file)
-                                blockchain_file.close()
                         except IndexError:
+                            blockchain.remove(item_id, reason, None)
+                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain.write_blockchain(blockchain_file)
+                            blockchain_file.close()
                             pass
                     else:
                         print("Error, reason not given for removal")
