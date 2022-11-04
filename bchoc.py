@@ -207,8 +207,7 @@ def main():
                                 continue
                         else:
                             print("error")
-                    elif search.state == "RELEASED" or search.state == "DISPOSED" or \
-                            search.state == "DESTROYED":
+                    elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED" or "CHECKEDIN" or "CHECKEDOUT":
                         exit(1)
                 except IndexError:
                     exit(1)
