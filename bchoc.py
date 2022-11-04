@@ -101,7 +101,7 @@ class Blockchain:
     def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
         current = self.find_bchoc_item(passed_item_id)
         if current.state != "RELEASED" and current.state != "DESTROYED" and current.state != "DISPOSED":
-            if current.state != "DNE":
+            if current.state != "DNE" and current.state != "CHECKEDIN":
                 current.state = "CHECKEDIN"
                 checkin_time = datetime.now(timezone.utc).isoformat()
                 print("Case: " + current.case_id + "\nChecked in item: " + current.item_id + "\n\tStatus: "
@@ -173,9 +173,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
