@@ -93,10 +93,13 @@ class Blockchain:
                       + current.state + "\n\tTime of action: " + checkout_time)
             elif current.state == "CHECKEDOUT":
                 print("Error: Cannot check out a checked out item. Must check it in first.")
+                exit(1)
             else:
                 print("item not found")
+                exit(1)
         else:
             print("Cannot check out, item is " + current.state)
+            exit(1)
 
     def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
         current = self.find_bchoc_item(passed_item_id)
@@ -106,10 +109,15 @@ class Blockchain:
                 checkin_time = datetime.now(timezone.utc).isoformat()
                 print("Case: " + current.case_id + "\nChecked in item: " + current.item_id + "\n\tStatus: "
                       + current.state + "\n\tTime of action: " + checkin_time)
+            elif current.state == "CHECKEDIN":
+                print("Cannot checkin an item that is already checkedin")
+                exit(1)
             else:
                 print("Cannot checkin an item that does not exist")
+                exit(1)
         else:
             print("Cannot check in, item is " + current.state)
+            exit(1)
 
     def forward_log(self, num_entries):  # prints Blockchain
         log = self.head
@@ -142,6 +150,7 @@ class Blockchain:
                       "\n\tOwner info: " + owner_info + "\n\tTime of action: " + curr_time)
             else:
                 print("Error! Must input owner info")
+                exit(1)
         else:
             curr_time = datetime.now(timezone.utc).isoformat()
             item = self.find_bchoc_item(passed_item_id)
