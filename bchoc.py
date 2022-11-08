@@ -119,7 +119,7 @@ class Blockchain:
             print("Cannot check in, item is " + current.state)
             exit(1)
 
-    def forward_log(self, num_entries):  # prints Blockchain
+    def forward_log(self, num_entries, case_id, item_id):  # prints Blockchain
         log = self.head
         if num_entries == -1:
             while log is not None:
@@ -182,9 +182,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
@@ -253,14 +253,94 @@ def main():
                 else:
                     print("Checkin Error")
                     exit(1)
-
             case 'log':
-                blockchain.forward_log(-1)
-                # reverse print if user inputs "-r" blockchain.reverse_log(blockchain.head)
+                match user_input[1]:
+                    case "-r":
+                        if user_input[2] == "-n":
+                            num_entries = user_input[3]
+                            if user_input[4] == "-c":
+                                case_id = user_input[5]
+                                if user_input[6] == "-i":
+                                    item_id = user_input[7]
+                                    # blockchain.reverse_log(num_entries, case_id, item_id)
+                                else:
+                                    # blockchain.reverse_log(num_entries, case_id, None)
+                            elif user_input[4] == "-i":
+                                item_id = user_input[5]
+                                # blockchain.reverse_log(num_entries, None, item_id)
+                            else:
+                                # blockchain.reverse_log(num_entries, None, None)
+                        else:
+                            if user_input[2] == "-c":
+                                case_id = user_input[3]
+                                if user_input[4] == "-i":
+                                    item_id = user_input[5]
+                                    # blockchain.reverse_log(num_entries, case_id, item_id)
+                                else:
+                                    # blockchain.reverse_log(num_entries, case_id, None)
+                            elif user_input[2] == "-i":
+                                item_id = user_input[5]
+                                # blockchain.reverse_log(num_entries, None, item_id)
+                    case "--reverse":
+                        if user_input[2] == "-n":
+                            num_entries = user_input[3]
+                            if user_input[4] == "-c":
+                                case_id = user_input[5]
+                                if user_input[6] == "-i":
+                                    item_id = user_input[7]
+                                    # blockchain.reverse_log(num_entries, case_id, item_id)
+                                else:
+                            # blockchain.reverse_log(num_entries, case_id, None)
+                            elif user_input[4] == "-i":
+                                item_id = user_input[5]
+                                # blockchain.reverse_log(num_entries, None, item_id)
+                            else:
+                        # blockchain.reverse_log(num_entries, None, None)
+                        else:
+                            if user_input[2] == "-c":
+                                case_id = user_input[3]
+                                if user_input[4] == "-i":
+                                    item_id = user_input[5]
+                                    # blockchain.reverse_log(num_entries, case_id, item_id)
+                                else:
+                            # blockchain.reverse_log(num_entries, case_id, None)
+                            elif user_input[2] == "-i":
+                                item_id = user_input[5]
+                                # blockchain.reverse_log(num_entries, None, item_id)
+                    case "-n":
+                        num_entries = user_input[2]
+                        if user_input[3] == "-c":
+                            case_id = user_input[4]
+                            if user_input[5] == "-i":
+                                item_id = user_input[6]
+                                blockchain.forward_log(num_entries, case_id, item_id)
+                            else:
+                                blockchain.forward_log(num_entries, case_id, None)
+                        elif user_input[3] == "-i":
+                            item_id = user_input[4]
+                            blockchain.forward_log(num_entries, None, item_id)
+                        else:
+                            blockchain.forward_log(num_entries, None, None)
+                    case "-i":
+                        try:
+                            item_id = user_input[2]
+                            blockchain.forward_log(None, None, item_id)
+                        except IndexError:
+                            exit(1)
+                    case "-c":
+                        case_id = user_input[2]
+                        if user_input[3] == "-i":
+                            item_id = user_input[4]
+                            blockchain.forward_log(None, case_id, item_id)
+                        else:
+                            blockchain.forward_log(None, case_id, None)
+                    case _:
+                        print("error")
+                        exit(1)
             case 'remove':
                 if user_input[1] == '-i':
                     item_id = user_input[2]
-                    if user_input[3] == "-y":
+                    if user_input[3] == "-y" or user_input[3] == "--why":
                         reason = user_input[4]
                         try:
                             if user_input[5] == "-o":
