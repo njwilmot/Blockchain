@@ -121,24 +121,132 @@ class Blockchain:
 
     def forward_log(self, num_entries, case_id, item_id):  # prints Blockchain
         log = self.head
-        if num_entries == -1:
-            while log is not None:
-                print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
-                      "\nTime: " + str(log.time_stamp) + "\n")
-                log = log.next
-        else:
-            for x in range(num_entries):
-                print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
-                      "\nTime: " + str(log.time_stamp) + "\n")
-                log = log.next
+        rev2 = []
+        while log is not None:
+            rev = []
+            if log.item_id is not None:
+                rev.append(str(log.case_id))
+                rev.append(str(log.item_id))
+                rev.append(str(log.state))
+                rev.append(str(log.time_stamp))
+            if len(rev) > 0:
+                rev2.append(rev)
+            log = log.next
 
-    def reverse_log(self, log, num_entries):  # prints Blockchain in reverse
-        if log:
-            self.reverse_log(log.next)
-            print("Case: " + str(log.case_id) + "\nItem: " + str(log.item_id) + "\nAction: " + str(log.state) +
-                  "\nTime: " + str(log.time_stamp) + "\n")
+        length = len(rev2)
+        if num_entries == -1:
+            if case_id == '':
+                if item_id == '':
+                    for data in (rev2[1:]):
+                        print("\nCase: " + str(data[0]))
+                        print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                else:
+                    for data in (rev2[1:]):
+                        for i in data:
+                            if i == item_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+            else:
+                if item_id == '':
+                    for data in (rev2[1:]):
+                        for d in data:
+                            if d == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                else:
+                    for data in (rev2[1:]):
+                        for i in data:
+                            if i == item_id and data[0] == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+
         else:
-            return
+            if num_entries + 1 <= length:
+                if case_id == '':
+                    if item_id == '':
+                        for data in (rev2[1:]):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                    else:
+                        for data in (rev2[1:]):
+                            for i in data:
+                                if i == item_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                        data[3]))
+                else:
+                    if num_entries == 1:
+                        for data in (rev2[1:]):
+                            for d in data:
+                                if d == case_id and data[1] == item_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                    else:
+                        for data in (rev2[1:num_entries+1]):
+                            for d in data:
+                                if d == case_id and data[1] == item_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+            else:
+                print("too many entries")
+
+    def reverse_log(self, num_entries, case_id, item_id):
+        log = self.head
+        rev2 = []
+        while log is not None:
+            rev = []
+            if log.item_id is not None:
+                rev.append(str(log.case_id))
+                rev.append(str(log.item_id))
+                rev.append(str(log.state))
+                rev.append(str(log.time_stamp))
+            if len(rev) > 0:
+                rev2.append(rev)
+            log = log.next
+
+        length = len(rev2)
+        if num_entries == -1:
+            if case_id == '':
+                if item_id == '':
+                    for data in (reversed(rev2[1:])):
+                        print("\nCase: " + str(data[0]))
+                        print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                else:
+                    for data in (reversed(rev2[1:])):
+                        for i in data:
+                            if i == item_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+            else:
+                if item_id == '':
+                    for data in (reversed(rev2[1:])):
+                        for d in data:
+                            if d == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                else:
+                    for data in (reversed(rev2[1:])):
+                        for d in data:
+                            if d == case_id:
+                                if data[1] == item_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+        else:
+            if num_entries + 1 <= length:
+                if case_id == '':
+                    for data in (rev2[1:]):
+                        print("\nCase: " + str(data[0]))
+                        print("Item: " + str(data[1]) + "\nAction: " + str(
+                            data[2]) + "\nTime: " + str(data[3]))
+                else:
+                    for data in (rev2[1:num_entries + 1]):
+                        for d in data:
+                            if d == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(data[3]))
+            else:
+                print("too many entries")
 
     def remove(self, passed_item_id, reason, owner_info):  # removes a block
         if reason == 'RELEASED':
@@ -177,14 +285,14 @@ def main():
     blockchain = Blockchain()
     blockchain_file = open('blockchain.txt', 'r')
     blockchain.read_blockchain(blockchain_file)
-    global size
+    global size, rever
 
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    inp = input()
-    user_input = inp.split()
-    #user_input = sys.argv[1:]
+    # inp = input()
+    # user_input = inp.split()
+    user_input = sys.argv[1:]
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
@@ -254,89 +362,32 @@ def main():
                     print("Checkin Error")
                     exit(1)
             case 'log':
-                match user_input[1]:
-                    case "-r":
-                        if user_input[2] == "-n":
-                            num_entries = user_input[3]
-                            if user_input[4] == "-c":
-                                case_id = user_input[5]
-                                if user_input[6] == "-i":
-                                    item_id = user_input[7]
-                                    # blockchain.reverse_log(num_entries, case_id, item_id)
-                                else:
-                                    # blockchain.reverse_log(num_entries, case_id, None)
-                            elif user_input[4] == "-i":
-                                item_id = user_input[5]
-                                # blockchain.reverse_log(num_entries, None, item_id)
-                            else:
-                                # blockchain.reverse_log(num_entries, None, None)
-                        else:
-                            if user_input[2] == "-c":
-                                case_id = user_input[3]
-                                if user_input[4] == "-i":
-                                    item_id = user_input[5]
-                                    # blockchain.reverse_log(num_entries, case_id, item_id)
-                                else:
-                                    # blockchain.reverse_log(num_entries, case_id, None)
-                            elif user_input[2] == "-i":
-                                item_id = user_input[5]
-                                # blockchain.reverse_log(num_entries, None, item_id)
-                    case "--reverse":
-                        if user_input[2] == "-n":
-                            num_entries = user_input[3]
-                            if user_input[4] == "-c":
-                                case_id = user_input[5]
-                                if user_input[6] == "-i":
-                                    item_id = user_input[7]
-                                    # blockchain.reverse_log(num_entries, case_id, item_id)
-                                else:
-                            # blockchain.reverse_log(num_entries, case_id, None)
-                            elif user_input[4] == "-i":
-                                item_id = user_input[5]
-                                # blockchain.reverse_log(num_entries, None, item_id)
-                            else:
-                        # blockchain.reverse_log(num_entries, None, None)
-                        else:
-                            if user_input[2] == "-c":
-                                case_id = user_input[3]
-                                if user_input[4] == "-i":
-                                    item_id = user_input[5]
-                                    # blockchain.reverse_log(num_entries, case_id, item_id)
-                                else:
-                            # blockchain.reverse_log(num_entries, case_id, None)
-                            elif user_input[2] == "-i":
-                                item_id = user_input[5]
-                                # blockchain.reverse_log(num_entries, None, item_id)
-                    case "-n":
-                        num_entries = user_input[2]
-                        if user_input[3] == "-c":
-                            case_id = user_input[4]
-                            if user_input[5] == "-i":
-                                item_id = user_input[6]
-                                blockchain.forward_log(num_entries, case_id, item_id)
-                            else:
-                                blockchain.forward_log(num_entries, case_id, None)
-                        elif user_input[3] == "-i":
-                            item_id = user_input[4]
-                            blockchain.forward_log(num_entries, None, item_id)
-                        else:
-                            blockchain.forward_log(num_entries, None, None)
-                    case "-i":
-                        try:
-                            item_id = user_input[2]
-                            blockchain.forward_log(None, None, item_id)
-                        except IndexError:
-                            exit(1)
-                    case "-c":
-                        case_id = user_input[2]
-                        if user_input[3] == "-i":
-                            item_id = user_input[4]
-                            blockchain.forward_log(None, case_id, item_id)
-                        else:
-                            blockchain.forward_log(None, case_id, None)
-                    case _:
-                        print("error")
-                        exit(1)
+                rever = False
+                num = -1
+                case = ''
+                id = ''
+                if len(user_input) > 1:
+                    for it in user_input[1:]:
+                        if it == '-n':
+                            n = user_input.index('-n')
+                            num = user_input[n + 1]
+                        if it == '-i':
+                            i = user_input.index('-i')
+                            id = user_input[i + 1]
+                        if it == '-c':
+                            c = user_input.index('-c')
+                            case = user_input[c + 1]
+                        if it == '-r':
+                            rever = True
+                    for it in user_input[1:]:
+                        if it == '-r':
+                            blockchain.reverse_log(int(num), case, id)
+                        if rever is False:
+                            blockchain.forward_log(int(num), case, id)
+                            break
+
+                else:
+                    blockchain.forward_log(int(num), case, id)
             case 'remove':
                 if user_input[1] == '-i':
                     item_id = user_input[2]
