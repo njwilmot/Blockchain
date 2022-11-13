@@ -377,10 +377,10 @@ def main():
                         if it == '-c':
                             c = user_input.index('-c')
                             case = user_input[c + 1]
-                        if it == '-r':
+                        if it == '-r' or '--reverse':
                             rever = True
                     for it in user_input[1:]:
-                        if it == '-r':
+                        if it == '-r' or '--reverse':
                             blockchain.reverse_log(int(num), case, id)
                         if rever is False:
                             blockchain.forward_log(int(num), case, id)
