@@ -328,13 +328,13 @@ def main():
                     except IndexError:
                         exit(1)
                         pass
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(file_path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
                     blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(file_path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
@@ -343,7 +343,7 @@ def main():
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkout(item)
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(file_path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
@@ -353,7 +353,7 @@ def main():
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkin(item)
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(file_path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
@@ -395,12 +395,12 @@ def main():
                             if user_input[5] == "-o":
                                 info = " ".join(user_input[6:])
                                 blockchain.remove(item_id, reason, info)
-                                blockchain_file = open('blockchain.txt', 'w')
+                                blockchain_file = open(file_path, 'w')
                                 blockchain.write_blockchain(blockchain_file)
                                 blockchain_file.close()
                         except IndexError:
                             blockchain.remove(item_id, reason, None)
-                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain_file = open(file_path, 'w')
                             blockchain.write_blockchain(blockchain_file)
                             blockchain_file.close()
                             pass
@@ -417,7 +417,7 @@ def main():
                 else:
                     blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(file_path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
