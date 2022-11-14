@@ -132,7 +132,6 @@ class Blockchain:
             if len(rev) > 0:
                 rev2.append(rev)
             log = log.next
-
         length = len(rev2)
         if num_entries == -1:
             if case_id == '':
@@ -276,22 +275,21 @@ class Blockchain:
                 prev = current.next
         """
 
-    # def init(self):
-
     # def verify(self):
 
 
 def main():
     blockchain = Blockchain()
-    blockchain_file = open('blockchain.txt', 'r')
+    file_path = os.environ.get("BCHOC_FILE_PATH")
+    blockchain_file = open(file_path, 'r')
     blockchain.read_blockchain(blockchain_file)
     global size, rever
 
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    # inp = input()
-    # user_input = inp.split()
+    #inp = input()
+    #user_input = inp.split()
     user_input = sys.argv[1:]
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
