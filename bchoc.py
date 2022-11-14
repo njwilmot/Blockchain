@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import sys, os
 
 size = 0
+os.environ.get("BCHOC_FILE_PATH")
 
 
 class Block:
@@ -132,6 +133,7 @@ class Blockchain:
             if len(rev) > 0:
                 rev2.append(rev)
             log = log.next
+
         length = len(rev2)
         if num_entries == -1:
             if case_id == '':
@@ -150,8 +152,9 @@ class Blockchain:
                     for data in (rev2[1:]):
                         for d in data:
                             if d == case_id:
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                                print("\nCase: " + str(data[0]) + "\nItem: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                                if d == case_id and data[1] == d:
+                                    break
                 else:
                     for data in (rev2[1:]):
                         for i in data:
@@ -163,29 +166,38 @@ class Blockchain:
             if num_entries + 1 <= length:
                 if case_id == '':
                     if item_id == '':
-                        for data in (rev2[1:]):
-                            print("\nCase: " + str(data[0]))
-                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                            for data in (rev2[1:num_entries+1]):
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                    data[3]))
+                            for data in (rev2[1:]):
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
                     else:
                         for data in (rev2[1:]):
                             for i in data:
-                                if i == item_id:
+                                if i == data[1] and i != data[0]:
                                     print("\nCase: " + str(data[0]))
                                     print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
                                         data[3]))
                 else:
-                    if num_entries == 1:
-                        for data in (rev2[1:]):
-                            for d in data:
-                                if d == case_id and data[1] == item_id:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
-                    else:
+                    if item_id == '':
                         for data in (rev2[1:num_entries+1]):
                             for d in data:
+                                if d == case_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                        data[3]))
+                                if d == case_id and data[1] == d:
+                                    break
+
+                    else:
+                        for data in (rev2[1:num_entries + 1]):
+                            for d in data:
                                 if d == case_id and data[1] == item_id:
                                     print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                        data[3]))
             else:
                 print("too many entries")
 
@@ -229,21 +241,49 @@ class Blockchain:
                             if d == case_id:
                                 if data[1] == item_id:
                                     print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                        data[3]))
         else:
             if num_entries + 1 <= length:
                 if case_id == '':
-                    for data in (rev2[1:]):
-                        print("\nCase: " + str(data[0]))
-                        print("Item: " + str(data[1]) + "\nAction: " + str(
-                            data[2]) + "\nTime: " + str(data[3]))
+                    if item_id == '':
+                        for data in (reversed(rev2[1:num_entries + 1])):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(
+                                data[2]) + "\nTime: " + str(
+                                data[3]))
+                        for data in (reversed(rev2[1:])):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(
+                                data[2]) + "\nTime: " + str(data[3]))
+                    else:
+                        for data in (reversed(rev2[1:])):
+                            for i in data:
+                                if i == data[1] and i != data[0]:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(
+                                        data[2]) + "\nTime: " + str(
+                                        data[3]))
                 else:
-                    for data in (rev2[1:num_entries + 1]):
-                        for d in data:
-                            if d == case_id:
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(
-                                    data[2]) + "\nTime: " + str(data[3]))
+                    if item_id == '':
+                        for data in (reversed(rev2[1:num_entries + 1])):
+                            for d in data:
+                                if d == case_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(
+                                        data[2]) + "\nTime: " + str(
+                                        data[3]))
+                                if d == case_id and data[1] == d:
+                                    break
+
+                    else:
+                        for data in (reversed(rev2[1:num_entries + 1])):
+                            for d in data:
+                                if d == case_id and data[1] == item_id:
+                                    print("\nCase: " + str(data[0]))
+                                    print("Item: " + str(data[1]) + "\nAction: " + str(
+                                        data[2]) + "\nTime: " + str(
+                                        data[3]))
             else:
                 print("too many entries")
 
@@ -275,21 +315,22 @@ class Blockchain:
                 prev = current.next
         """
 
+    # def init(self):
+
     # def verify(self):
 
 
 def main():
     blockchain = Blockchain()
-    file_path = os.environ.get("BCHOC_FILE_PATH")
-    blockchain_file = open(file_path, 'r')
+    blockchain_file = open('blockchain.txt', 'r')
     blockchain.read_blockchain(blockchain_file)
     global size, rever
 
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
+    # inp = input()
+    # user_input = inp.split()
     user_input = sys.argv[1:]
     time = datetime.now(timezone.utc).isoformat()  # timestamp in UTC
     if len(user_input) > 0:
@@ -328,13 +369,13 @@ def main():
                     except IndexError:
                         exit(1)
                         pass
-                    blockchain_file = open(file_path, 'w')
+                    blockchain_file = open('blockchain.txt', 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
                     blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open(file_path, 'w')
+                    blockchain_file = open('blockchain.txt', 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
@@ -343,7 +384,7 @@ def main():
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkout(item)
-                    blockchain_file = open(file_path, 'w')
+                    blockchain_file = open('blockchain.txt', 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
@@ -353,7 +394,7 @@ def main():
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkin(item)
-                    blockchain_file = open(file_path, 'w')
+                    blockchain_file = open('blockchain.txt', 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
@@ -375,10 +416,10 @@ def main():
                         if it == '-c':
                             c = user_input.index('-c')
                             case = user_input[c + 1]
-                        if it == '-r' or '--reverse':
+                        if it == '-r' or it == '--reverse':
                             rever = True
                     for it in user_input[1:]:
-                        if it == '-r' or '--reverse':
+                        if it == '-r' or it == '--reverse':
                             blockchain.reverse_log(int(num), case, id)
                         if rever is False:
                             blockchain.forward_log(int(num), case, id)
@@ -395,12 +436,12 @@ def main():
                             if user_input[5] == "-o":
                                 info = " ".join(user_input[6:])
                                 blockchain.remove(item_id, reason, info)
-                                blockchain_file = open(file_path, 'w')
+                                blockchain_file = open('blockchain.txt', 'w')
                                 blockchain.write_blockchain(blockchain_file)
                                 blockchain_file.close()
                         except IndexError:
                             blockchain.remove(item_id, reason, None)
-                            blockchain_file = open(file_path, 'w')
+                            blockchain_file = open('blockchain.txt', 'w')
                             blockchain.write_blockchain(blockchain_file)
                             blockchain_file.close()
                             pass
@@ -417,7 +458,7 @@ def main():
                 else:
                     blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open(file_path, 'w')
+                    blockchain_file = open('blockchain.txt', 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
