@@ -152,7 +152,8 @@ class Blockchain:
                     for data in (rev2[1:]):
                         for d in data:
                             if d == case_id:
-                                print("\nCase: " + str(data[0]) + "\nItem: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                                print("\nCase: " + str(data[0]) + "\nItem: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(data[3]))
                                 if d == case_id and data[1] == d:
                                     break
                 else:
@@ -166,13 +167,13 @@ class Blockchain:
             if num_entries + 1 <= length:
                 if case_id == '':
                     if item_id == '':
-                            for data in (rev2[1:num_entries+1]):
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
-                                    data[3]))
-                            for data in (rev2[1:]):
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
+                        for data in (rev2[1:num_entries + 1]):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                data[3]))
+                        for data in (rev2[1:]):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
                     else:
                         for data in (rev2[1:]):
                             for i in data:
@@ -182,7 +183,7 @@ class Blockchain:
                                         data[3]))
                 else:
                     if item_id == '':
-                        for data in (rev2[1:num_entries+1]):
+                        for data in (rev2[1:num_entries + 1]):
                             for d in data:
                                 if d == case_id:
                                     print("\nCase: " + str(data[0]))
@@ -247,11 +248,6 @@ class Blockchain:
             if num_entries + 1 <= length:
                 if case_id == '':
                     if item_id == '':
-                        for data in (reversed(rev2[1:num_entries + 1])):
-                            print("\nCase: " + str(data[0]))
-                            print("Item: " + str(data[1]) + "\nAction: " + str(
-                                data[2]) + "\nTime: " + str(
-                                data[3]))
                         for data in (reversed(rev2[1:])):
                             print("\nCase: " + str(data[0]))
                             print("Item: " + str(data[1]) + "\nAction: " + str(
@@ -266,7 +262,7 @@ class Blockchain:
                                         data[3]))
                 else:
                     if item_id == '':
-                        for data in (reversed(rev2[1:num_entries + 1])):
+                        for data in (reversed(rev2[num_entries+1:])):
                             for d in data:
                                 if d == case_id:
                                     print("\nCase: " + str(data[0]))
@@ -277,13 +273,15 @@ class Blockchain:
                                     break
 
                     else:
-                        for data in (reversed(rev2[1:num_entries + 1])):
+                        for data in (reversed(rev2[num_entries + 1:])):
                             for d in data:
                                 if d == case_id and data[1] == item_id:
                                     print("\nCase: " + str(data[0]))
                                     print("Item: " + str(data[1]) + "\nAction: " + str(
                                         data[2]) + "\nTime: " + str(
                                         data[3]))
+                                if d == case_id and data[1] == d:
+                                    break
             else:
                 print("too many entries")
 
