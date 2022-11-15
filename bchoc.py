@@ -171,9 +171,6 @@ class Blockchain:
                             print("\nCase: " + str(data[0]))
                             print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
                                 data[3]))
-                        for data in (rev2[1:]):
-                            print("\nCase: " + str(data[0]))
-                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
                     else:
                         for data in (rev2[1:]):
                             for i in data:
@@ -252,10 +249,16 @@ class Blockchain:
             if num_entries + 1 <= length:
                 if case_id == '':
                     if item_id == '':
-                        for data in (reversed(rev2[1:])):
-                            print("\nCase: " + str(data[0]))
-                            print("Item: " + str(data[1]) + "\nAction: " + str(
-                                data[2]) + "\nTime: " + str(data[3]))
+                        if num_entries == 1:
+                            for data in (reversed(rev2[num_entries + 1:])):
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(data[3]))
+                        else:
+                            for data in (reversed(rev2[1:])):
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(data[3]))
                     else:
                         for data in (reversed(rev2[1:])):
                             for i in data:
