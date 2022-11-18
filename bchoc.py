@@ -368,7 +368,7 @@ def main():
                                                                 int(tail.data_length))
                                     sha256 = hashlib.sha256(packed_struct).hexdigest()
                                 else:
-                                    sha256 = hex(0)
+                                    sha256 = str(hex(0))
                                 new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
                                 print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                       "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
