@@ -342,9 +342,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    inp = input()
-    user_input = inp.split()
-    #user_input = sys.argv[1:]
+    #inp = input()
+    #user_input = inp.split()
+    user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
