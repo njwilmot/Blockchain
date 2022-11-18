@@ -298,7 +298,7 @@ class Blockchain:
     def remove(self, passed_item_id, reason, owner_info):  # removes a block
         if reason == 'RELEASED':
             if owner_info != 'NONE':
-                curr_time = maya.now().datetime(to_timezone="utc").timestamp()
+                curr_time = maya.now().iso8601()
                 item = self.find_bchoc_item(passed_item_id)
                 item.state = reason
                 print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
@@ -307,7 +307,7 @@ class Blockchain:
                 print("Error! Must input owner info")
                 exit(1)
         else:
-            curr_time = maya.now().datetime(to_timezone="utc").timestamp()
+            curr_time = maya.now().iso8601()
             item = self.find_bchoc_item(passed_item_id)
             item.state = reason
             print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
