@@ -342,9 +342,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
@@ -368,7 +368,7 @@ def main():
                                                                 int(tail.data_length))
                                     sha256 = hashlib.sha256(packed_struct).hexdigest()
                                 else:
-                                    sha256 = None
+                                    sha256 = hex(0)
                                 new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
                                 print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                       "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
@@ -381,7 +381,8 @@ def main():
                                             item_id = user_input[6 + offset]
                                             tail = blockchain.bchoc_tail
                                             packed_struct = struct.pack('32s d 16s I 12s I',
-                                                                        bytes(tail.prev_hash, encoding='utf-8'), maya.parse(str(tail.time_stamp)).datetime().timestamp(),
+                                                                        bytes(tail.prev_hash, encoding='utf-8'),
+                                                                        maya.parse(str(tail.time_stamp)).datetime().timestamp(),
                                                                         bytes(tail.case_id, encoding='utf-8'),
                                                                         int(tail.item_id),
                                                                         bytes(tail.state, encoding='utf-8'),
