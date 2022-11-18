@@ -40,15 +40,16 @@ class Blockchain:
             current = current.next
 
     def read_blockchain(self, file):
+        s = "\n"
         while True:
             try:
-                prev_hash = next(file).strip("\n")
-                time_stamp = next(file).strip("\n")
-                case_id = next(file).strip("\n")
-                item_id = next(file).strip("\n")
-                state = next(file).strip("\n")
-                data_length = next(file).strip("\n")
-                data = next(file).strip("\n")
+                prev_hash = next(file).strip(s)
+                time_stamp = next(file).strip(s)
+                case_id = next(file).strip(s)
+                item_id = next(file).strip(s)
+                state = next(file).strip(s)
+                data_length = next(file).strip(s)
+                data = next(file).strip(s)
                 new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, data)
                 self.add(new_block)
             except StopIteration:
@@ -329,10 +330,15 @@ class Blockchain:
 
 def main():
     blockchain = Blockchain()
-    blockchain_file = open('blockchain.txt', 'r')
-    blockchain.read_blockchain(blockchain_file)
-    global size, rever
 
+    if not ("BCHOC_FILE_PATH" in os.environ):
+        os.environ["BCHOC_FILE_PATH"] = "file.bin"
+
+    path = os.environ["BCHOC_FILE_PATH"]
+    if not os.path.exists(path):
+        open(path, 'w')
+
+    global size, rever
     # cheese = True  # Noah likes cheese
     # while cheese:
 
@@ -342,6 +348,7 @@ def main():
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
+                blockchain.read_blockchain(open(path, 'r'))
                 if blockchain.head:
                     try:
                         case_id = user_input[2]
@@ -397,39 +404,42 @@ def main():
                     except IndexError:
                         exit(1)
                         pass
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
                     time = maya.now().iso8601()
                     blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
 
             case 'checkout':
+                blockchain.read_blockchain(open(path, 'r'))
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkout(item)
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
                     print("Checkout Error")
                     exit(1)
             case 'checkin':
+                blockchain.read_blockchain(open(path, 'r'))
                 if user_input[1] == "-i":
                     item = user_input[2]
                     blockchain.checkin(item)
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
                     print("Checkin Error")
                     exit(1)
             case 'log':
+                blockchain.read_blockchain(open(path, 'r'))
                 rever = False
                 num = -1
                 case = ''
@@ -457,6 +467,7 @@ def main():
                 else:
                     blockchain.forward_log(int(num), case, id)
             case 'remove':
+                blockchain.read_blockchain(open(path, 'r'))
                 if user_input[1] == '-i':
                     item_id = user_input[2]
                     if user_input[3] == "-y" or user_input[3] == "--why":
@@ -465,12 +476,12 @@ def main():
                             if user_input[5] == "-o":
                                 info = " ".join(user_input[6:])
                                 blockchain.remove(item_id, reason, info)
-                                blockchain_file = open('blockchain.txt', 'w')
+                                blockchain_file = open(path, 'w')
                                 blockchain.write_blockchain(blockchain_file)
                                 blockchain_file.close()
                         except IndexError:
                             blockchain.remove(item_id, reason, None)
-                            blockchain_file = open('blockchain.txt', 'w')
+                            blockchain_file = open(path, 'w')
                             blockchain.write_blockchain(blockchain_file)
                             blockchain_file.close()
                             pass
@@ -488,7 +499,7 @@ def main():
                     time = maya.now().iso8601()
                     blockchain.head = Block("None", time, None, None, "INITIAL", 14, "Initial block")
                     size += 1
-                    blockchain_file = open('blockchain.txt', 'w')
+                    blockchain_file = open(path, 'w')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.")
