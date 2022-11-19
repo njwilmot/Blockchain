@@ -15,6 +15,7 @@ class Block:
         self.state = state
         self.data_length = data_length
         self.data = data
+        self.prev = None
         self.next = None
 
 
@@ -56,16 +57,17 @@ class Blockchain:
                 break
 
     def __init__(self, head=None):
-        self.bchoc_tail = head
+        self.prev = head
         self.head = head
+        self.tail = head
 
     def is_empty(self):
         return self.__sizeof__()
 
     def find_bchoc_item(self, item_id):
-        current = self.head
-        while current.next and (current.item_id != item_id):
-            current = current.next
+        current = self.tail
+        while current.prev and (current.item_id != item_id):
+            current = current.prev
         if current.item_id == item_id:
             return current
         else:
@@ -80,45 +82,67 @@ class Blockchain:
             while current.next:
                 current = current.next
             current.next = new_block
-            self.bchoc_tail = new_block
+            new_block.prev = current
+            self.tail = new_block
         else:
             self.head = new_block
-            self.bchoc_tail = self.head
+            self.tail = self.head
+            self.prev = None
 
     def checkout(self, passed_item_id):  # checks out a block item and marks its state as "CHECKED OUT"
-        current = self.find_bchoc_item(passed_item_id)
-        if current.state != 'RELEASED' and current.state != "DESTROYED" and current.state != "DISPOSED":
-            if current.state != "DNE" and current.state != "CHECKEDOUT":
-                current.state = "CHECKEDOUT"
+        parent = self.find_bchoc_item(passed_item_id)
+        if parent.state != 'RELEASED' and parent.state != "DESTROYED" and parent.state != "DISPOSED":
+            if parent.state != "DNE" and parent.state != "CHECKEDOUT":
+                packed_struct = struct.pack('32s d 16s I 12s I',
+                                            bytes(parent.prev_hash,
+                                                  encoding='utf-8'),
+                                            maya.parse(str(parent.time_stamp)).datetime().timestamp(),
+                                            bytes(parent.case_id, encoding='utf-8'),
+                                            int(parent.item_id),
+                                            bytes(parent.state, encoding='utf-8'),
+                                            int(parent.data_length))
+                sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkout_time = maya.now().iso8601()
-                print("Case: " + current.case_id + "\nChecked out item: " + current.item_id + "\n\tStatus: "
-                      + current.state + "\n\tTime of action: " + checkout_time)
-            elif current.state == "CHECKEDOUT":
+                new_block = Block(sha256, checkout_time, parent.case_id, parent.item_id, "CHECKEDOUT", 0, None)
+                self.add(new_block)
+                print("Case: " + new_block.case_id + "\nChecked out item: " + new_block.item_id + "\n\tStatus: "
+                      + new_block.state + "\n\tTime of action: " + checkout_time)
+            elif parent.state == "CHECKEDOUT":
                 print("Error: Cannot check out a checked out item. Must check it in first.")
                 exit(1)
             else:
                 print("item not found")
                 exit(1)
         else:
-            print("Cannot check out, item is " + current.state)
+            print("Cannot check out, item is " + parent.state)
             exit(1)
 
     def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
-        current = self.find_bchoc_item(passed_item_id)
-        if current.state != "RELEASED" and current.state != "DESTROYED" and current.state != "DISPOSED":
-            if current.state != "DNE" and current.state != "CHECKEDIN":
-                current.state = "CHECKEDIN"
+        parent = self.find_bchoc_item(passed_item_id)
+        if parent.state != "RELEASED" and parent.state != "DESTROYED" and parent.state != "DISPOSED":
+            if parent.state != "DNE" and parent.state != "CHECKEDIN":
+                packed_struct = struct.pack('32s d 16s I 12s I',
+                                            bytes(parent.prev_hash,
+                                                  encoding='utf-8'),
+                                            maya.parse(str(parent.time_stamp)).datetime().timestamp(),
+                                            bytes(parent.case_id, encoding='utf-8'),
+                                            int(parent.item_id),
+                                            bytes(parent.state, encoding='utf-8'),
+                                            int(parent.data_length))
+                sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkin_time = maya.now().iso8601()
-                print("Case: " + current.case_id + "\nChecked in item: " + current.item_id + "\n\tStatus: "
-                      + current.state + "\n\tTime of action: " + checkin_time)
-            elif current.state == "CHECKEDIN":
+                new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, None)
+                self.add(new_block)
+                print("Case: " + parent.case_id + "\nChecked in item: " + parent.item_id + "\n\tStatus: "
+                      + parent.state + "\n\tTime of action: " + checkin_time)
+            elif parent.state == "CHECKEDIN":
                 print("Cannot checkin an item that is already checkedin")
                 exit(1)
             else:
                 print("Cannot checkin an item that does not exist")
                 exit(1)
         else:
-            print("Cannot check in, item is " + current.state)
+            print("Cannot check in, item is " + parent.state)
             exit(1)
 
     def forward_log(self, num_entries, case_id, item_id):  # prints Blockchain
@@ -298,20 +322,40 @@ class Blockchain:
     def remove(self, passed_item_id, reason, owner_info):  # removes a block
         if reason == 'RELEASED':
             if owner_info != 'NONE':
-                curr_time = maya.now().iso8601()
-                item = self.find_bchoc_item(passed_item_id)
-                item.state = reason
-                print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
-                      "\n\tOwner info: " + owner_info + "\n\tTime of action: " + curr_time)
+                remove_time = maya.now().iso8601()
+                parent = self.find_bchoc_item(passed_item_id)
+                packed_struct = struct.pack('32s d 16s I 12s I',
+                                            bytes(parent.prev_hash,
+                                                  encoding='utf-8'),
+                                            maya.parse(str(parent.time_stamp)).datetime().timestamp(),
+                                            bytes(parent.case_id, encoding='utf-8'),
+                                            int(parent.item_id),
+                                            bytes(parent.state, encoding='utf-8'),
+                                            int(parent.data_length))
+                sha256 = hashlib.sha256(packed_struct).hexdigest()
+                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, None)
+                self.add(new_block)
+                print("Case: " + parent.case_id + "\nRemoved Item: " + parent.item_id + "\n\tStatus: " + parent.state +
+                      "\n\tOwner info: " + owner_info + "\n\tTime of action: " + remove_time)
             else:
                 print("Error! Must input owner info")
                 exit(1)
         else:
-            curr_time = maya.now().iso8601()
-            item = self.find_bchoc_item(passed_item_id)
-            item.state = reason
-            print("Case: " + item.case_id + "\nRemoved Item: " + item.item_id + "\n\tStatus: " + item.state +
-                  "\n\tTime of action: " + curr_time)
+            remove_time = maya.now().iso8601()
+            parent = self.find_bchoc_item(passed_item_id)
+            packed_struct = struct.pack('32s d 16s I 12s I',
+                                        bytes(parent.prev_hash,
+                                              encoding='utf-8'),
+                                        maya.parse(str(parent.time_stamp)).datetime().timestamp(),
+                                        bytes(parent.case_id, encoding='utf-8'),
+                                        int(parent.item_id),
+                                        bytes(parent.state, encoding='utf-8'),
+                                        int(parent.data_length))
+            sha256 = hashlib.sha256(packed_struct).hexdigest()
+            new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, None)
+            self.add(new_block)
+            print("Case: " + parent.case_id + "\nRemoved Item: " + parent.item_id + "\n\tStatus: " + parent.state +
+                  "\n\tTime of action: " + remove_time)
 
         """
         current = self.head
@@ -342,9 +386,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
@@ -357,18 +401,7 @@ def main():
                         time = maya.now().iso8601()
                         if search.state == "DNE":
                             if size > 0:
-                                if blockchain.bchoc_tail.state != "INITIAL":
-                                    tail = blockchain.bchoc_tail
-                                    packed_struct = struct.pack('32s d 16s I 12s I',
-                                                                bytes(tail.prev_hash,
-                                                                      encoding='utf-8'), maya.parse(str(tail.time_stamp)).datetime().timestamp(),
-                                                                bytes(tail.case_id, encoding='utf-8'),
-                                                                int(tail.item_id),
-                                                                bytes(tail.state, encoding='utf-8'),
-                                                                int(tail.data_length))
-                                    sha256 = hashlib.sha256(packed_struct).hexdigest()
-                                else:
-                                    sha256 = str(hex(0))
+                                sha256 = str(hex(0))
                                 new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
                                 print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                       "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
@@ -379,15 +412,7 @@ def main():
                                     try:
                                         if user_input[5 + offset] == "-i":
                                             item_id = user_input[6 + offset]
-                                            tail = blockchain.bchoc_tail
-                                            packed_struct = struct.pack('32s d 16s I 12s I',
-                                                                        bytes(tail.prev_hash, encoding='utf-8'),
-                                                                        maya.parse(str(tail.time_stamp)).datetime().timestamp(),
-                                                                        bytes(tail.case_id, encoding='utf-8'),
-                                                                        int(tail.item_id),
-                                                                        bytes(tail.state, encoding='utf-8'),
-                                                                        int(tail.data_length))
-                                            sha256 = hashlib.sha256(packed_struct).hexdigest()
+                                            sha256 = str(hex(0))
                                             time = maya.now().iso8601()
                                             new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
                                             print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
