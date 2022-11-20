@@ -388,14 +388,14 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
                 blockchain.read_blockchain(open(path, 'rb'))
-                if blockchain.head:
+                if blockchain.head is not None:
                     try:
                         case_id = user_input[2]
                         item_id = user_input[4]
@@ -436,8 +436,8 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
-                    time = maya.now().iso8601()
-                    blockchain.head = Block(None, time, None, None, "INITIAL", 14, "Initial block")
+                    sha256 = "0"
+                    blockchain.head = Block(sha256, 0, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
                     size += 1
                     blockchain_file = open(path, 'wb')
                     blockchain.write_blockchain(blockchain_file)
