@@ -25,13 +25,13 @@ class Blockchain:
         current = self.head
         while current is not None:
             if current.state == "INITIAL":
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
                                             current.time_stamp, uuid.UUID(current.case_id).bytes,
                                             int(current.item_id),
                                             bytes(current.state, encoding='utf-8'),
                                             int(current.data_length))
             else:
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
                                             maya.parse(str(current.time_stamp)).datetime().timestamp(),
                                             uuid.UUID(current.case_id).bytes, int(current.item_id),
                                             bytes(current.state, encoding='utf-8'), int(current.data_length))
@@ -333,7 +333,7 @@ class Blockchain:
             if owner_info != 'NONE':
                 remove_time = maya.now().iso8601()
                 parent = self.find_bchoc_item(passed_item_id)
-                packed_struct = struct.pack('32s d 16s I 12s I',
+                packed_struct = struct.pack('32s d 16s I 11s I',
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -352,7 +352,7 @@ class Blockchain:
         else:
             remove_time = maya.now().iso8601()
             parent = self.find_bchoc_item(passed_item_id)
-            packed_struct = struct.pack('32s d 16s I 12s I',
+            packed_struct = struct.pack('32s d 16s I 11s I',
                                         bytes(parent.prev_hash,
                                               encoding='utf-8'),
                                         maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -429,7 +429,7 @@ def main():
                                 try:
                                     if user_input[5 + offset] == "-i":
                                         item_id = user_input[6 + offset]
-                                        sha256 = str(hex(0))
+                                        sha256 = "0"
                                         time = maya.now().iso8601()
                                         new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
                                         print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
