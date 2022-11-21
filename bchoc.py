@@ -172,18 +172,18 @@ class Blockchain:
         if num_entries == -1:
             if case_id == '':
                 if item_id == '':
-                    for data in (rev2[1:]):
+                    for data in rev2:
                         print("\nCase: " + str(data[0]))
                         print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
                 else:
-                    for data in (rev2[1:]):
+                    for data in rev2:
                         for i in data:
                             if i == item_id:
                                 print("\nCase: " + str(data[0]))
                                 print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
             else:
                 if item_id == '':
-                    for data in (rev2[1:]):
+                    for data in rev2:
                         for d in data:
                             if d == case_id:
                                 print("\nCase: " + str(data[0]) + "\nItem: " + str(data[1]) + "\nAction: " + str(
@@ -191,47 +191,44 @@ class Blockchain:
                                 if d == case_id and data[1] == d:
                                     break
                 else:
-                    for data in (rev2[1:]):
+                    for data in rev2:
                         for i in data:
                             if i == item_id and data[0] == case_id:
                                 print("\nCase: " + str(data[0]))
                                 print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
 
         else:
-            if num_entries + 1 <= length:
-                if case_id == '':
-                    if item_id == '':
-                        for data in (rev2[1:num_entries + 1]):
-                            print("\nCase: " + str(data[0]))
-                            print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
-                                data[3]))
-                    else:
-                        for data in (rev2[1:]):
-                            for i in data:
-                                if i == data[1] and i != data[0]:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
-                                        data[3]))
+            if case_id == '':
+                if item_id == '':
+                    for data in (rev2[:num_entries]):
+                        print("\nCase: " + str(data[0]))
+                        print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                            data[3]))
                 else:
-                    if item_id == '':
-                        for data in (rev2[1:num_entries + 1]):
-                            for d in data:
-                                if d == case_id:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
-                                        data[3]))
-                                if d == case_id and data[1] == d:
-                                    break
-
-                    else:
-                        for data in (rev2[1:num_entries + 1]):
-                            for d in data:
-                                if d == case_id and data[1] == item_id:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
-                                        data[3]))
+                    for data in (rev2[1:]):
+                        for i in data:
+                            if i == data[1] and i != data[0]:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                    data[3]))
             else:
-                print("too many entries")
+                if item_id == '':
+                    for data in (rev2[:num_entries]):
+                        for d in data:
+                            if d == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                    data[3]))
+                            if d == case_id and data[1] == d:
+                                break
+
+                else:
+                    for data in (rev2[:num_entries]):
+                        for d in data:
+                            if d == case_id and data[1] == item_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(
+                                    data[3]))
 
     def reverse_log(self, num_entries, case_id, item_id):
         log = self.head
@@ -251,18 +248,18 @@ class Blockchain:
         if num_entries == -1:
             if case_id == '':
                 if item_id == '':
-                    for data in (reversed(rev2[1:])):
+                    for data in (reversed(rev2)):
                         print("\nCase: " + str(data[0]))
                         print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
                 else:
-                    for data in (reversed(rev2[1:])):
+                    for data in (reversed(rev2)):
                         for i in data:
                             if i == item_id:
                                 print("\nCase: " + str(data[0]))
                                 print("Item: " + str(data[1]) + "\nAction: " + str(data[2]) + "\nTime: " + str(data[3]))
             else:
                 if item_id == '':
-                    for data in (reversed(rev2[1:])):
+                    for data in (reversed(rev2)):
                         for d in data:
                             if d == case_id:
                                 print("\nCase: " + str(data[0]))
@@ -270,7 +267,7 @@ class Blockchain:
                             if d == case_id and data[1] == d:
                                 break
                 else:
-                    for data in (reversed(rev2[1:])):
+                    for data in (reversed(rev2)):
                         for d in data:
                             if d == case_id:
                                 if data[1] == item_id:
@@ -280,53 +277,50 @@ class Blockchain:
                             if d == case_id and data[1] == d:
                                 break
         else:
-            if num_entries + 1 <= length:
-                if case_id == '':
-                    if item_id == '':
-                        if num_entries == 1:
-                            for data in (reversed(rev2[num_entries + 1:])):
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(
-                                    data[2]) + "\nTime: " + str(data[3]))
-                        else:
-                            for data in (reversed(rev2[1:])):
-                                print("\nCase: " + str(data[0]))
-                                print("Item: " + str(data[1]) + "\nAction: " + str(
-                                    data[2]) + "\nTime: " + str(data[3]))
+            if case_id == '':
+                if item_id == '':
+                    if num_entries == 1:
+                        for data in (reversed(rev2[num_entries:])):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(
+                                data[2]) + "\nTime: " + str(data[3]))
                     else:
-                        for data in (reversed(rev2[1:])):
-                            for i in data:
-                                if i == data[1] and i != data[0]:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(
-                                        data[2]) + "\nTime: " + str(
-                                        data[3]))
-                                if i == case_id and data[1] == i:
-                                    break
+                        for data in (reversed(rev2)):
+                            print("\nCase: " + str(data[0]))
+                            print("Item: " + str(data[1]) + "\nAction: " + str(
+                                data[2]) + "\nTime: " + str(data[3]))
                 else:
-                    if item_id == '':
-                        for data in (reversed(rev2[1:num_entries + 1])):
-                            for d in data:
-                                if d == case_id:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(
-                                        data[2]) + "\nTime: " + str(
-                                        data[3]))
-                                if d == case_id and data[1] == d:
-                                    break
-
-                    else:
-                        for data in (reversed(rev2[num_entries + 1:])):
-                            for d in data:
-                                if d == case_id and data[1] == item_id:
-                                    print("\nCase: " + str(data[0]))
-                                    print("Item: " + str(data[1]) + "\nAction: " + str(
-                                        data[2]) + "\nTime: " + str(
-                                        data[3]))
-                                if d == case_id and data[1] == d:
-                                    break
+                    for data in (reversed(rev2)):
+                        for i in data:
+                            if i == data[1] and i != data[0]:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(
+                                    data[3]))
+                            if i == case_id and data[1] == i:
+                                break
             else:
-                print("too many entries")
+                if item_id == '':
+                    for data in (reversed(rev2[:num_entries])):
+                        for d in data:
+                            if d == case_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(
+                                    data[3]))
+                            if d == case_id and data[1] == d:
+                                break
+
+                else:
+                    for data in (reversed(rev2[num_entries:])):
+                        for d in data:
+                            if d == case_id and data[1] == item_id:
+                                print("\nCase: " + str(data[0]))
+                                print("Item: " + str(data[1]) + "\nAction: " + str(
+                                    data[2]) + "\nTime: " + str(
+                                    data[3]))
+                            if d == case_id and data[1] == d:
+                                break
 
     def remove(self, passed_item_id, reason, owner_info):  # removes a block
         if reason == 'RELEASED':
