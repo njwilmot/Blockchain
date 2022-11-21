@@ -379,14 +379,54 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
                 blockchain.read_blockchain(open(path, 'rb'))
-                if blockchain.head is None:
+                if blockchain.head is not None:
+                    try:
+                        case_id = user_input[2]
+                        item_id = user_input[4]
+                        search = blockchain.find_bchoc_item(item_id)
+                        time = maya.now().iso8601()
+                        if search.state == "DNE":
+                            if size > 0:
+                                sha256 = "0"
+                                new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
+                                print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                      "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
+                                blockchain.add(new_block)
+                                more_items = True
+                                offset = 0
+                                while more_items:
+                                    try:
+                                        if user_input[5 + offset] == "-i":
+                                            item_id = user_input[6 + offset]
+                                            sha256 = "0"
+                                            time = maya.now().iso8601()
+                                            new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
+                                            print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
+                                                  "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
+                                            blockchain.add(new_block)
+                                            offset += 2
+                                    except IndexError:
+                                        more_items = False
+                                        pass
+                                    continue
+                            else:
+                                print("error")
+                        elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED" or "CHECKEDIN" or "CHECKEDOUT":
+                            exit(1)
+                    except IndexError:
+                        exit(1)
+                        pass
+                    blockchain_file = open(path, 'wb')
+                    blockchain.write_blockchain(blockchain_file)
+                    blockchain_file.close()
+                else:
                     sha256 = "0"
                     time = maya.now().iso8601()
                     blockchain.head = Block(sha256, time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
@@ -396,45 +436,6 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.\n")
-                try:
-                    case_id = user_input[2]
-                    item_id = user_input[4]
-                    search = blockchain.find_bchoc_item(item_id)
-                    time = maya.now().iso8601()
-                    if search.state == "DNE":
-                        if size > 0:
-                            sha256 = "0"
-                            new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
-                            print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
-                                  "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
-                            blockchain.add(new_block)
-                            more_items = True
-                            offset = 0
-                            while more_items:
-                                try:
-                                    if user_input[5 + offset] == "-i":
-                                        item_id = user_input[6 + offset]
-                                        sha256 = "0"
-                                        time = maya.now().iso8601()
-                                        new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
-                                        print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
-                                              "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
-                                        blockchain.add(new_block)
-                                        offset += 2
-                                except IndexError:
-                                    more_items = False
-                                    pass
-                                continue
-                        else:
-                            print("error")
-                    elif search.state == "RELEASED" or search.state == "DISPOSED" or search.state == "DESTROYED" or "CHECKEDIN" or "CHECKEDOUT":
-                        exit(1)
-                except IndexError:
-                    exit(1)
-                    pass
-                blockchain_file = open(path, 'wb')
-                blockchain.write_blockchain(blockchain_file)
-                blockchain_file.close()
 
             case 'checkout':
                 blockchain.read_blockchain(open(path, 'rb'))
