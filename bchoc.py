@@ -24,7 +24,7 @@ class Blockchain:
     def write_blockchain(self, file):
         current = self.head
         while current is not None:
-            packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
+            packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
                                         maya.parse(str(current.time_stamp)).datetime().timestamp(),
                                         uuid.UUID(current.case_id).bytes, int(current.item_id),
                                         bytes(current.state, encoding='utf-8'), int(current.data_length))
@@ -32,14 +32,14 @@ class Blockchain:
             current = current.next
 
     def read_blockchain(self, file):
-        struct_format = '32s d 16s I 11s I'
+        struct_format = '32s d 16s I 12s I'
         struct_size = struct.calcsize(struct_format)
         while file is not None:
             try:
                 data = file.read(struct_size)
                 if not data:
                     break
-                s = struct.unpack('32s d 16s I 11s I', data)
+                s = struct.unpack('32s d 16s I 12s I', data)
                 prev_hash = s[0].decode("utf-8").replace("\x00", "")
                 time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
                 case_id = str(uuid.UUID(s[2].hex()))
@@ -317,7 +317,7 @@ class Blockchain:
             if owner_info != 'NONE':
                 remove_time = maya.now().iso8601()
                 parent = self.find_bchoc_item(passed_item_id)
-                packed_struct = struct.pack('32s d 16s I 11s I',
+                packed_struct = struct.pack('32s d 16s I 12s I',
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -336,7 +336,7 @@ class Blockchain:
         else:
             remove_time = maya.now().iso8601()
             parent = self.find_bchoc_item(passed_item_id)
-            packed_struct = struct.pack('32s d 16s I 11s I',
+            packed_struct = struct.pack('32s d 16s I 12s I',
                                         bytes(parent.prev_hash,
                                               encoding='utf-8'),
                                         maya.parse(str(parent.time_stamp)).datetime().timestamp(),
