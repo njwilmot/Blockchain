@@ -48,10 +48,7 @@ class Blockchain:
                     break
                 s = struct.unpack('32s d 16s I 12s I', data)
                 prev_hash = s[0].decode("utf-8").replace("\x00", "")
-                if s[1] != 0:
-                    time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
-                else:
-                    time_stamp = s[1]
+                time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
                 case_id = str(uuid.UUID(s[2].hex()))
                 item_id = s[3]
                 state = s[4].decode("utf-8").replace("\x00", "")
