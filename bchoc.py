@@ -330,7 +330,7 @@ class Blockchain:
                                             bytes(parent.state, encoding='utf-8'),
                                             int(parent.data_length))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
-                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, None)
+                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, "")
                 self.add(new_block)
                 print("Case: " + parent.case_id + "\nRemoved Item: " + str(parent.item_id) + "\n\tStatus: " + parent.state +
                       "\n\tOwner info: " + owner_info + "\n\tTime of action: " + remove_time)
