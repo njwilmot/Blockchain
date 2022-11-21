@@ -24,15 +24,10 @@ class Blockchain:
     def write_blockchain(self, file):
         current = self.head
         while current is not None:
-            if current.state == "INITIAL":
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
-                                            float(current.time_stamp), uuid.UUID(current.case_id).bytes, int(current.item_id),
-                                            bytes(current.state, encoding='utf-8'), int(current.data_length))
-            else:
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
-                                            maya.parse(str(current.time_stamp)).datetime().timestamp(),
-                                            uuid.UUID(current.case_id).bytes, int(current.item_id),
-                                            bytes(current.state, encoding='utf-8'), int(current.data_length))
+            packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                                        maya.parse(str(current.time_stamp)).datetime().timestamp(),
+                                        uuid.UUID(current.case_id).bytes, int(current.item_id),
+                                        bytes(current.state, encoding='utf-8'), int(current.data_length))
             file.write(packed_struct)
             file.write(bytes(current.data, encoding='utf-8'))
             current = current.next
@@ -47,10 +42,7 @@ class Blockchain:
                     break
                 s = struct.unpack('32s d 16s I 12s I', data)
                 prev_hash = s[0].decode("utf-8").replace("\x00", "")
-                if s[1] == 0:
-                    time_stamp = str(s[1])
-                else:
-                    time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
+                time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
                 case_id = str(uuid.UUID(s[2].hex()))
                 item_id = s[3]
                 state = s[4].decode("utf-8").replace("\x00", "")
@@ -439,7 +431,8 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
-                    blockchain.head = Block("0", "0", "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                    time = maya.now().iso8601()
+                    blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
@@ -527,7 +520,8 @@ def main():
                 if size > 0:
                     print("Blockchain file found with INITIAL block.\n")
                 else:
-                    blockchain.head = Block("0", "0", "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                    time = maya.now().iso8601()
+                    blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
