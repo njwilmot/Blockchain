@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import maya
+import datetime as DT
 import sys, os, hashlib, struct, uuid
 
 size = 0
@@ -46,13 +47,16 @@ class Blockchain:
                 if not data:
                     break
                 s = struct.unpack('32s d 16s I 12s I', data)
-                prev_hash = s[0].decode("utf-8")
-                time_stamp = s[1]
-                case_id = s[2].hex()
+                prev_hash = s[0].decode("utf-8").replace("\x00", "")
+                if s[1] != 0:
+                    time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
+                else:
+                    time_stamp = s[1]
+                case_id = str(uuid.UUID(s[2].hex()))
                 item_id = s[3]
                 state = s[4].decode("utf-8").replace("\x00", "")
                 data_length = s[5]
-                block_data = None
+                block_data = ""
                 new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, block_data)
                 self.add(new_block)
             except StopIteration:
@@ -68,9 +72,9 @@ class Blockchain:
 
     def find_bchoc_item(self, item_id):
         current = self.tail
-        while current.prev and (current.item_id != item_id):
+        while current.prev is not None and current.item_id != int(item_id):
             current = current.prev
-        if current.item_id == item_id:
+        if current.item_id == int(item_id):
             return current
         else:
             temp_block = Block(None, None, None, None, "DNE", None, None)
@@ -96,8 +100,7 @@ class Blockchain:
         if parent.state != 'RELEASED' and parent.state != "DESTROYED" and parent.state != "DISPOSED":
             if parent.state != "DNE" and parent.state != "CHECKEDOUT":
                 packed_struct = struct.pack('32s d 16s I 12s I',
-                                            bytes(parent.prev_hash,
-                                                  encoding='utf-8'),
+                                            bytes(parent.prev_hash, encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
                                             bytes(parent.case_id, encoding='utf-8'),
                                             int(parent.item_id),
@@ -107,7 +110,7 @@ class Blockchain:
                 checkout_time = maya.now().iso8601()
                 new_block = Block(sha256, checkout_time, parent.case_id, parent.item_id, "CHECKEDOUT", 0, None)
                 self.add(new_block)
-                print("Case: " + new_block.case_id + "\nChecked out item: " + new_block.item_id + "\n\tStatus: "
+                print("Case: " + new_block.case_id + "\nChecked out item: " + str(new_block.item_id) + "\n\tStatus: "
                       + new_block.state + "\n\tTime of action: " + checkout_time)
             elif parent.state == "CHECKEDOUT":
                 print("Error: Cannot check out a checked out item. Must check it in first.")
@@ -135,7 +138,7 @@ class Blockchain:
                 checkin_time = maya.now().iso8601()
                 new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, None)
                 self.add(new_block)
-                print("Case: " + parent.case_id + "\nChecked in item: " + parent.item_id + "\n\tStatus: "
+                print("Case: " + parent.case_id + "\nChecked in item: " + str(parent.item_id) + "\n\tStatus: "
                       + parent.state + "\n\tTime of action: " + checkin_time)
             elif parent.state == "CHECKEDIN":
                 print("Cannot checkin an item that is already checkedin")
@@ -388,9 +391,9 @@ def main():
     # cheese = True  # Noah likes cheese
     # while cheese:
 
-    #inp = input()
-    #user_input = inp.split()
-    user_input = sys.argv[1:]
+    inp = input()
+    user_input = inp.split()
+    #user_input = sys.argv[1:]
     if len(user_input) > 0:
         match user_input[0]:  # fix will cause arr out of bounds error
             case 'add':
