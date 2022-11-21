@@ -24,11 +24,17 @@ class Blockchain:
     def write_blockchain(self, file):
         current = self.head
         while current is not None:
-            packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
-                                        maya.parse(str(current.time_stamp)).datetime().timestamp(),
-                                        uuid.UUID(current.case_id).bytes, int(current.item_id),
-                                        bytes(current.state, encoding='utf-8'), int(current.data_length))
+            if current.state == "INITIAL":
+                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                                            float(current.time_stamp), uuid.UUID(current.case_id).bytes, int(current.item_id),
+                                            bytes(current.state, encoding='utf-8'), int(current.data_length))
+            else:
+                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                                            maya.parse(str(current.time_stamp)).datetime().timestamp(),
+                                            uuid.UUID(current.case_id).bytes, int(current.item_id),
+                                            bytes(current.state, encoding='utf-8'), int(current.data_length))
             file.write(packed_struct)
+            file.write(bytes(current.data, encoding='utf-8'))
             current = current.next
 
     def read_blockchain(self, file):
@@ -41,12 +47,18 @@ class Blockchain:
                     break
                 s = struct.unpack('32s d 16s I 12s I', data)
                 prev_hash = s[0].decode("utf-8").replace("\x00", "")
-                time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
+                if s[1] == 0:
+                    time_stamp = str(s[1])
+                else:
+                    time_stamp = DT.datetime.utcfromtimestamp(s[1]).isoformat()
                 case_id = str(uuid.UUID(s[2].hex()))
                 item_id = s[3]
                 state = s[4].decode("utf-8").replace("\x00", "")
                 data_length = s[5]
-                block_data = ""
+                if data_length != 0:
+                    block_data = file.read(data_length - 1).decode("utf-8").replace("\x00", "")
+                else:
+                    block_data = file.read(data_length).decode("utf-8").replace("\x00", "")
                 new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, block_data)
                 self.add(new_block)
             except StopIteration:
@@ -102,7 +114,7 @@ class Blockchain:
                                             int(parent.data_length))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkout_time = maya.now().iso8601()
-                new_block = Block(sha256, checkout_time, parent.case_id, parent.item_id, "CHECKEDOUT", 0, None)
+                new_block = Block(sha256, checkout_time, parent.case_id, parent.item_id, "CHECKEDOUT", 0, "")
                 self.add(new_block)
                 print("Case: " + new_block.case_id + "\nChecked out item: " + str(new_block.item_id) + "\n\tStatus: "
                       + new_block.state + "\n\tTime of action: " + checkout_time)
@@ -130,7 +142,7 @@ class Blockchain:
                                             int(parent.data_length))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkin_time = maya.now().iso8601()
-                new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, None)
+                new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, "")
                 self.add(new_block)
                 print("Case: " + parent.case_id + "\nChecked in item: " + str(parent.item_id) + "\n\tStatus: "
                       + parent.state + "\n\tTime of action: " + checkin_time)
@@ -345,7 +357,7 @@ class Blockchain:
                                         bytes(parent.state, encoding='utf-8'),
                                         int(parent.data_length))
             sha256 = hashlib.sha256(packed_struct).hexdigest()
-            new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, None)
+            new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, "")
             self.add(new_block)
             print("Case: " + parent.case_id + "\nRemoved Item: " + str(parent.item_id) + "\n\tStatus: " + parent.state +
                   "\n\tTime of action: " + remove_time)
@@ -395,7 +407,7 @@ def main():
                         if search.state == "DNE":
                             if size > 0:
                                 sha256 = "0"
-                                new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
+                                new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, "")
                                 print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                       "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
                                 blockchain.add(new_block)
@@ -407,7 +419,7 @@ def main():
                                             item_id = user_input[6 + offset]
                                             sha256 = "0"
                                             time = maya.now().iso8601()
-                                            new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, None)
+                                            new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, "")
                                             print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                                   "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
                                             blockchain.add(new_block)
@@ -427,9 +439,7 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
-                    sha256 = "0"
-                    time = maya.now().iso8601()
-                    blockchain.head = Block(sha256, time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                    blockchain.head = Block("0", "0", "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
@@ -517,9 +527,7 @@ def main():
                 if size > 0:
                     print("Blockchain file found with INITIAL block.\n")
                 else:
-                    sha256 = "0"
-                    time = maya.now().iso8601()
-                    blockchain.head = Block(sha256, time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                    blockchain.head = Block("0", "0", "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
