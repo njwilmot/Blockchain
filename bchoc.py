@@ -395,7 +395,7 @@ def main():
                     blockchain_file = open(path, 'wb')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
-                    print("Blockchain file not found. Created INITIAL block.")
+                    print("Blockchain file not found. Created INITIAL block.\n")
                 try:
                     case_id = user_input[2]
                     item_id = user_input[4]
@@ -514,7 +514,7 @@ def main():
 
             case 'init':
                 if size > 0:
-                    print("Blockchain file found with INITIAL block.")
+                    print("Blockchain file found with INITIAL block.\n")
                 else:
                     sha256 = "0"
                     time = maya.now().iso8601()
@@ -524,7 +524,7 @@ def main():
                     blockchain_file = open(path, 'wb')
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
-                    print("Blockchain file not found. Created INITIAL block.")
+                    print("Blockchain file not found. Created INITIAL block.\n")
             case 'verify':
                 print("verify")
             case _:
