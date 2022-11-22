@@ -22,7 +22,7 @@ class Block:
 class Blockchain:
 
     def check_size(self, file):
-        struct_format = '32s d 16s I 12s I'
+        struct_format = '32s d 16s I 11s I'
         struct_size = struct.calcsize(struct_format)
         while file is not None:
             try:
@@ -39,7 +39,7 @@ class Blockchain:
         while current is not None:
             c = current.prev_hash.to_bytes(1, 'little')
             #           bytes(str(current.prev_hash), encoding='utf-8')
-            packed_struct = struct.pack('32s d 16s I 12s I', c,
+            packed_struct = struct.pack('32s d 16s I 11s I', c,
                                         float(current.time_stamp),
                                         uuid.UUID(current.case_id).bytes, int(current.item_id),
                                         bytes(current.state, encoding='utf-8'), int(current.data_length))
@@ -51,12 +51,12 @@ class Blockchain:
         current = self.head
         while current is not None:
             if current.state == "INITIAL":
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
                                             float(current.time_stamp),
                                             uuid.UUID(current.case_id).bytes, int(current.item_id),
                                             bytes(current.state, encoding='utf-8'), int(current.data_length))
             else:
-                packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+                packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
                                             maya.parse(str(current.time_stamp)).datetime().timestamp(),
                                             uuid.UUID(current.case_id).bytes, int(current.item_id),
                                             bytes(current.state, encoding='utf-8'), int(current.data_length))
@@ -65,14 +65,14 @@ class Blockchain:
             current = current.next
 
     def read_blockchain(self, file):
-        struct_format = '32s d 16s I 12s I'
+        struct_format = '32s d 16s I 11s I'
         struct_size = struct.calcsize(struct_format)
         while file is not None:
             try:
                 data = file.read(struct_size)
                 if not data:
                     break
-                s = struct.unpack('32s d 16s I 12s I', data)
+                s = struct.unpack('32s d 16s I 11s I', data)
                 prev_hash = s[0].decode("utf-8").replace("\x00", "")
                 if s[1] == 0:
                     time_stamp = s[1]
@@ -132,7 +132,7 @@ class Blockchain:
         parent = self.find_bchoc_item(passed_item_id)
         if parent.state != 'RELEASED' and parent.state != "DESTROYED" and parent.state != "DISPOSED":
             if parent.state != "DNE" and parent.state != "CHECKEDOUT":
-                packed_struct = struct.pack('32s d 16s I 12s I',
+                packed_struct = struct.pack('32s d 16s I 11s I',
                                             bytes(parent.prev_hash, encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
                                             bytes(parent.case_id, encoding='utf-8'),
@@ -159,7 +159,7 @@ class Blockchain:
         parent = self.find_bchoc_item(passed_item_id)
         if parent.state != "RELEASED" and parent.state != "DESTROYED" and parent.state != "DISPOSED":
             if parent.state != "DNE" and parent.state != "CHECKEDIN":
-                packed_struct = struct.pack('32s d 16s I 12s I',
+                packed_struct = struct.pack('32s d 16s I 11s I',
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -381,7 +381,7 @@ class Blockchain:
             if owner_info is not None:
                 remove_time = maya.now().iso8601()
                 parent = self.find_bchoc_item(passed_item_id)
-                packed_struct = struct.pack('32s d 16s I 12s I',
+                packed_struct = struct.pack('32s d 16s I 11s I',
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -401,7 +401,7 @@ class Blockchain:
         else:
             remove_time = maya.now().iso8601()
             parent = self.find_bchoc_item(passed_item_id)
-            packed_struct = struct.pack('32s d 16s I 12s I',
+            packed_struct = struct.pack('32s d 16s I 11s I',
                                         bytes(parent.prev_hash,
                                               encoding='utf-8'),
                                         maya.parse(str(parent.time_stamp)).datetime().timestamp(),
