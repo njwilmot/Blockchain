@@ -34,25 +34,13 @@ class Blockchain:
             except StopIteration:
                 return 0
 
-    def write_init(self, file):
-        current = self.head
-        while current is not None:
-            c = current.prev_hash.to_bytes(1, 'little')
-            #           bytes(str(current.prev_hash), encoding='utf-8')
-            packed_struct = struct.pack('32s d 16s I 11s I', c,
-                                        float(current.time_stamp),
-                                        uuid.UUID(current.case_id).bytes, int(current.item_id),
-                                        bytes(current.state, encoding='utf-8'), int(current.data_length))
-            file.write(packed_struct)
-            file.write(bytes(current.data, encoding='utf-8'))
-            current = current.next
-
     def write_blockchain(self, file):
         current = self.head
         while current is not None:
             if current.state == "INITIAL":
-                packed_struct = struct.pack('32s d 16s I 11s I', bytes(current.prev_hash, encoding='utf-8'),
-                                            float(current.time_stamp),
+                c = current.prev_hash.to_bytes(1, 'little')
+                packed_struct = struct.pack('32s d 16s I 11s I', c,
+                                            maya.parse(str(current.time_stamp)).datetime().timestamp(),
                                             uuid.UUID(current.case_id).bytes, int(current.item_id),
                                             bytes(current.state, encoding='utf-8'), int(current.data_length))
             else:
@@ -492,14 +480,13 @@ def main():
                     blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                 else:
-                    #time = maya.now().iso8601()
-                    time = "0"
+                    time = maya.now().iso8601()
                     blockchain.head = Block(0, time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14,
                                             "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
-                    blockchain.write_init(blockchain_file)
+                    blockchain.write_blockchain(blockchain_file)
                     blockchain_file.close()
                     print("Blockchain file not found. Created INITIAL block.\n")
 
@@ -587,14 +574,13 @@ def main():
                     if blockchain.check_size(open(path, 'rb')) == 0:
                         print("Blockchain file found with INITIAL block.")
                     else:
-                        #time = maya.now().iso8601()
-                        time = 0
+                        time = maya.now().iso8601()
                         blockchain.head = Block(0, time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14,
                                                 "Initial block")
                         blockchain.tail = blockchain.head
                         size += 1
                         blockchain_file = open(path, 'wb')
-                        blockchain.write_init(blockchain_file)
+                        blockchain.write_blockchain(blockchain_file)
                         blockchain_file.close()
                         print("Blockchain file not found. Created INITIAL block.\n")
             case 'verify':
