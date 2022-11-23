@@ -136,7 +136,7 @@ class Blockchain:
         parent = self.find_bchoc_item(passed_item_id)
         if parent.state != 'RELEASED' and parent.state != "DESTROYED" and parent.state != "DISPOSED":
             if parent.state != "DNE" and parent.state != "CHECKEDOUT":
-                struct_parameters = '32s d 16s I 12s I' + str(parent.data_length) + 's'
+                struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash, encoding='utf-8'),
                                             maya.parse(str(parent.time_stamp)).datetime().timestamp(),
@@ -164,7 +164,7 @@ class Blockchain:
         parent = self.find_bchoc_item(passed_item_id)
         if parent.state != "RELEASED" and parent.state != "DESTROYED" and parent.state != "DISPOSED":
             if parent.state != "DNE" and parent.state != "CHECKEDIN":
-                struct_parameters = '32s d 16s I 12s I' + str(parent.data_length) + 's'
+                struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
@@ -387,7 +387,7 @@ class Blockchain:
             if owner_info is not None:
                 remove_time = maya.now().iso8601()
                 parent = self.find_bchoc_item(passed_item_id)
-                struct_parameters = '32s d 16s I 12s I' + str(parent.data_length) + 's'
+                struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash,
                                                   encoding='utf-8'),
@@ -397,7 +397,7 @@ class Blockchain:
                                             bytes(parent.state, encoding='utf-8'),
                                             int(parent.data_length), bytes(parent.data, encoding='utf-8'))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
-                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, owner_info)
+                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, len(owner_info), owner_info)
                 self.add(new_block)
                 print("Case: " + parent.case_id + "\nRemoved Item: " + str(
                     parent.item_id) + "\n\tStatus: " + parent.state +
@@ -408,7 +408,7 @@ class Blockchain:
         else:
             remove_time = maya.now().iso8601()
             parent = self.find_bchoc_item(passed_item_id)
-            struct_parameters = '32s d 16s I 12s I' + str(parent.data_length) + 's'
+            struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
             packed_struct = struct.pack(struct_parameters,
                                         bytes(parent.prev_hash,
                                               encoding='utf-8'),
