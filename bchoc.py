@@ -146,7 +146,7 @@ class Blockchain:
                                             int(parent.data_length), bytes(parent.data, encoding='utf-8'))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkout_time = maya.now().iso8601()
-                new_block = Block(sha256, checkout_time, parent.case_id, parent.item_id, "CHECKEDOUT", 0, "")
+                new_block = Block(sha256, checkout_time, current.case_id, current.item_id, "CHECKEDOUT", 0, "")
                 self.add(new_block)
                 print("Case: " + new_block.case_id + "\nChecked out item: " + str(new_block.item_id) + "\n\tStatus: "
                       + new_block.state + "\n\tTime of action: " + checkout_time)
@@ -157,7 +157,7 @@ class Blockchain:
                 print("item not found")
                 exit(1)
         else:
-            print("Cannot check out, item is " + parent.state)
+            print("Cannot check out, item is " + current.state)
             exit(1)
 
     def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
@@ -176,7 +176,7 @@ class Blockchain:
                                             int(parent.data_length), bytes(parent.data, encoding='utf-8'))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
                 checkin_time = maya.now().iso8601()
-                new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, "")
+                new_block = Block(sha256, checkin_time, current.case_id, current.item_id, "CHECKEDIN", 0, "")
                 self.add(new_block)
                 print("Case: " + new_block.case_id + "\nChecked in item: " + str(new_block.item_id) + "\n\tStatus: "
                       + new_block.state + "\n\tTime of action: " + checkin_time)
@@ -187,7 +187,7 @@ class Blockchain:
                 print("Cannot checkin an item that does not exist")
                 exit(1)
         else:
-            print("Cannot check in, item is " + parent.state)
+            print("Cannot check in, item is " + current.state)
             exit(1)
 
     def forward_log(self, num_entries, case_id, item_id):  # prints Blockchain
@@ -378,8 +378,8 @@ class Blockchain:
         if not check:
             exit(1)
         # removes a block
-        parent = self.find_bchoc_item(passed_item_id)
-        if parent.state == 'CHECKEDOUT':
+        current = self.find_bchoc_item(passed_item_id)
+        if current.state == 'CHECKEDOUT':
             print('error item CHECKEDOUT')
             exit(1)
         if reason != 'RELEASED' and reason != 'DISPOSED' and reason != 'DESTROYED':
@@ -398,7 +398,7 @@ class Blockchain:
                                             bytes(parent.state, encoding='utf-8'),
                                             int(parent.data_length), bytes(parent.data, encoding='utf-8'))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
-                new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, len(owner_info), owner_info)
+                new_block = Block(sha256, remove_time, current.case_id, current.item_id, reason, len(owner_info), owner_info)
                 self.add(new_block)
                 print("Case: " + parent.case_id + "\nRemoved Item: " + str(
                     parent.item_id) + "\n\tStatus: " + parent.state +
@@ -419,7 +419,7 @@ class Blockchain:
                                         bytes(parent.state, encoding='utf-8'),
                                         int(parent.data_length), bytes(parent.data, encoding='utf-8'))
             sha256 = hashlib.sha256(packed_struct).hexdigest()
-            new_block = Block(sha256, remove_time, parent.case_id, parent.item_id, reason, 0, "")
+            new_block = Block(sha256, remove_time, current.case_id, current.item_id, reason, 0, "")
             self.add(new_block)
             print("Case: " + parent.case_id + "\nRemoved Item: " + str(parent.item_id) + "\n\tStatus: " + parent.state +
                   "\n\tTime of action: " + remove_time)
