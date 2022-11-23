@@ -89,7 +89,9 @@ class Blockchain:
             state = (str(struct.unpack("12s", data[index + 60: index + 72])[0]).split("\\x")[0].split("'")[1])
             data_length = struct.unpack("I", data[index + 72: index + 76])[0]
             data_length_string = str(data_length) + "s"
-            block_data = (str(struct.unpack(data_length_string, data[index + 76: index + 76 + data_length])).split("\\x")[0].split("'")[1])
+            block_data = (
+            str(struct.unpack(data_length_string, data[index + 76: index + 76 + data_length])).split("\\x")[0].split(
+                "'")[1])
             new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, block_data)
             self.add(new_block)
             index = index + data_length + 76
@@ -398,7 +400,8 @@ class Blockchain:
                                             bytes(parent.state, encoding='utf-8'),
                                             int(parent.data_length), bytes(parent.data, encoding='utf-8'))
                 sha256 = hashlib.sha256(packed_struct).hexdigest()
-                new_block = Block(sha256, remove_time, current.case_id, current.item_id, reason, len(owner_info), owner_info)
+                new_block = Block(sha256, remove_time, current.case_id, current.item_id, reason, len(owner_info),
+                                  owner_info)
                 self.add(new_block)
                 print("Case: " + parent.case_id + "\nRemoved Item: " + str(
                     parent.item_id) + "\n\tStatus: " + parent.state +
@@ -434,7 +437,7 @@ class Blockchain:
                 prev = current.next
         """
 
-"""
+    """
     def verify(self):
         parent = self.head
         child = parent.next
@@ -459,6 +462,7 @@ class Blockchain:
                 bchoc_state = "CLEAN"
                 reason = ""
 """
+
 
 def main():
     blockchain = Blockchain()
@@ -489,7 +493,22 @@ def main():
                         time = maya.now().iso8601()
                         if search.state == "DNE":
                             if size > 0:
-                                sha256 = "0"
+                                if size > 1:
+                                    parent = blockchain.tail
+                                    struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
+                                    packed_struct = struct.pack(struct_parameters,
+                                                                bytes(parent.prev_hash,
+                                                                      encoding='utf-8'),
+                                                                maya.parse(
+                                                                    str(parent.time_stamp)).datetime().timestamp(),
+                                                                bytes(parent.case_id, encoding='utf-8'),
+                                                                int(parent.item_id),
+                                                                bytes(parent.state, encoding='utf-8'),
+                                                                int(parent.data_length),
+                                                                bytes(parent.data, encoding='utf-8'))
+                                    sha256 = hashlib.sha256(packed_struct).hexdigest()
+                                else:
+                                    sha256 = "0"
                                 new_block = Block(sha256, time, case_id, item_id, "CHECKEDIN", 0, "")
                                 print("Case: " + new_block.case_id + "\nAdded item: " + new_block.item_id +
                                       "\n\tStatus: " + new_block.state + "\n\tTime of action: " + new_block.time_stamp)
@@ -523,7 +542,8 @@ def main():
                     blockchain_file.close()
                 else:
                     time = maya.now().iso8601()
-                    blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                    blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14,
+                                            "Initial block")
                     blockchain.tail = blockchain.head
                     size += 1
                     blockchain_file = open(path, 'wb')
@@ -616,7 +636,8 @@ def main():
                         print("Blockchain file found with INITIAL block.")
                     else:
                         time = maya.now().iso8601()
-                        blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14, "Initial block")
+                        blockchain.head = Block("0", time, "00000000-0000-0000-0000-000000000000", 0, "INITIAL", 14,
+                                                "Initial block")
                         blockchain.tail = blockchain.head
                         size += 1
                         blockchain_file = open(path, 'wb')
