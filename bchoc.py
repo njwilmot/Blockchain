@@ -46,6 +46,7 @@ class Blockchain:
             current = current.next
 
     def read_blockchain(self, file):
+        """
         struct_format = '32s d 16s I 12s I'
         struct_size = struct.calcsize(struct_format)
         while file is not None:
@@ -71,6 +72,27 @@ class Blockchain:
                 self.add(new_block)
             except StopIteration:
                 break
+          """
+        struct_format = '32s d 16s I 12s I'
+        struct_size = struct.calcsize(struct_format)
+        data = file.read(struct_size)
+        index = 0
+        length = 0
+        while index <= (len(data) - 1):
+            prev_hash = (str(struct.unpack("32s", data[index: index + 32])).split("\\x")[0].split("'")[1])
+            temp = struct.unpack("d", data[index + 32: index + 40])[0]
+            if temp == 0:
+                time_stamp = temp
+            else:
+                time_stamp = DT.datetime.utcfromtimestamp(temp).isoformat()
+            case_id = (str(uuid.UUID(bytes=bytes(reversed(struct.unpack("16s", data[index + 40: index + 56])[0])))))
+            item_id = struct.unpack("I", data[index + 56: index + 60])[0]
+            state = (str(struct.unpack("12s", data[index + 60: index + 72])[0]).split("\\x")[0].split("'")[1])
+            data_length = struct.unpack("I", data[index + 72: index + 76])[0]
+            block_data = file.read(data_length - 1).decode("utf-8")
+            new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, block_data)
+            self.add(new_block)
+            index = index + data_length + 76
 
     def __init__(self, head=None):
         self.prev = head
