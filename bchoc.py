@@ -37,12 +37,13 @@ class Blockchain:
     def write_blockchain(self, file):
         current = self.head
         while current is not None:
-            packed_struct = struct.pack('32s d 16s I 12s I', bytes(current.prev_hash, encoding='utf-8'),
+            struct_parameters = '32s d 16s I 12s I ' + str(current.data_length) + "s"
+            packed_struct = struct.pack(struct_parameters, bytes(current.prev_hash, encoding='utf-8'),
                                         maya.parse(str(current.time_stamp)).datetime().timestamp(),
                                         uuid.UUID(current.case_id).bytes, int(current.item_id),
-                                        bytes(current.state, encoding='utf-8'), int(current.data_length))
+                                        bytes(current.state, encoding='utf-8'), int(current.data_length),
+                                        bytes(current.data, encoding='utf-8'))
             file.write(packed_struct)
-            file.write(bytes(current.data, encoding='utf-8'))
             current = current.next
 
     def read_blockchain(self, file):
@@ -73,9 +74,7 @@ class Blockchain:
             except StopIteration:
                 break
           """
-        struct_format = '32s d 16s I 12s I'
-        struct_size = struct.calcsize(struct_format)
-        data = file.read(struct_size)
+        data = file.read()
         index = 0
         length = 0
         while index <= (len(data) - 1):
@@ -89,7 +88,8 @@ class Blockchain:
             item_id = struct.unpack("I", data[index + 56: index + 60])[0]
             state = (str(struct.unpack("12s", data[index + 60: index + 72])[0]).split("\\x")[0].split("'")[1])
             data_length = struct.unpack("I", data[index + 72: index + 76])[0]
-            block_data = file.read(data_length - 1).decode("utf-8")
+            data_length_string = str(data_length) + "s"
+            block_data = (str(struct.unpack(data_length_string, data[index + 76: index + 76 + data_length])).split("\\x")[0].split("'")[1])
             new_block = Block(prev_hash, time_stamp, case_id, item_id, state, data_length, block_data)
             self.add(new_block)
             index = index + data_length + 76
