@@ -40,7 +40,7 @@ class Blockchain:
             struct_parameters = '32s d 16s I 12s I ' + str(current.data_length) + "s"
             packed_struct = struct.pack(struct_parameters, bytes(current.prev_hash, encoding='utf-8'),
                                         maya.parse(str(current.time_stamp)).datetime().timestamp(),
-                                        uuid.UUID(current.case_id).bytes, int(current.item_id),
+                                        bytes(reversed(uuid.UUID(current.case_id).bytes)), int(current.item_id),
                                         bytes(current.state, encoding='utf-8'), int(current.data_length),
                                         bytes(current.data, encoding='utf-8'))
             file.write(packed_struct)
