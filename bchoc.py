@@ -132,9 +132,10 @@ class Blockchain:
             self.prev = None
 
     def checkout(self, passed_item_id):  # checks out a block item and marks its state as "CHECKED OUT"
-        parent = self.find_bchoc_item(passed_item_id)
-        if parent.state != 'RELEASED' and parent.state != "DESTROYED" and parent.state != "DISPOSED":
-            if parent.state != "DNE" and parent.state != "CHECKEDOUT":
+        current = self.find_bchoc_item(passed_item_id)
+        if current.state != 'RELEASED' and current.state != "DESTROYED" and current.state != "DISPOSED":
+            if current.state != "DNE" and current.state != "CHECKEDOUT":
+                parent = self.tail
                 struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash, encoding='utf-8'),
@@ -149,7 +150,7 @@ class Blockchain:
                 self.add(new_block)
                 print("Case: " + new_block.case_id + "\nChecked out item: " + str(new_block.item_id) + "\n\tStatus: "
                       + new_block.state + "\n\tTime of action: " + checkout_time)
-            elif parent.state == "CHECKEDOUT":
+            elif current.state == "CHECKEDOUT":
                 print("Error: Cannot check out a checked out item. Must check it in first.")
                 exit(1)
             else:
@@ -160,9 +161,10 @@ class Blockchain:
             exit(1)
 
     def checkin(self, passed_item_id):  # checks in a block item and marks its state as "CHECKED IN"
-        parent = self.find_bchoc_item(passed_item_id)
-        if parent.state != "RELEASED" and parent.state != "DESTROYED" and parent.state != "DISPOSED":
-            if parent.state != "DNE" and parent.state != "CHECKEDIN":
+        current = self.find_bchoc_item(passed_item_id)
+        if current.state != "RELEASED" and current.state != "DESTROYED" and current.state != "DISPOSED":
+            if current.state != "DNE" and current.state != "CHECKEDIN":
+                parent = self.tail
                 struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash,
@@ -176,9 +178,9 @@ class Blockchain:
                 checkin_time = maya.now().iso8601()
                 new_block = Block(sha256, checkin_time, parent.case_id, parent.item_id, "CHECKEDIN", 0, "")
                 self.add(new_block)
-                print("Case: " + parent.case_id + "\nChecked in item: " + str(parent.item_id) + "\n\tStatus: "
-                      + parent.state + "\n\tTime of action: " + checkin_time)
-            elif parent.state == "CHECKEDIN":
+                print("Case: " + new_block.case_id + "\nChecked in item: " + str(new_block.item_id) + "\n\tStatus: "
+                      + new_block.state + "\n\tTime of action: " + checkin_time)
+            elif current.state == "CHECKEDIN":
                 print("Cannot checkin an item that is already checkedin")
                 exit(1)
             else:
@@ -385,7 +387,7 @@ class Blockchain:
         if reason == 'RELEASED':
             if owner_info is not None:
                 remove_time = maya.now().iso8601()
-                parent = self.find_bchoc_item(passed_item_id)
+                parent = self.tail
                 struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
                 packed_struct = struct.pack(struct_parameters,
                                             bytes(parent.prev_hash,
@@ -406,7 +408,7 @@ class Blockchain:
                 exit(1)
         else:
             remove_time = maya.now().iso8601()
-            parent = self.find_bchoc_item(passed_item_id)
+            parent = self.tail
             struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
             packed_struct = struct.pack(struct_parameters,
                                         bytes(parent.prev_hash,
@@ -432,10 +434,31 @@ class Blockchain:
                 prev = current.next
         """
 
-    # def init(self):
-
-    # def verify(self):
-
+"""
+    def verify(self):
+        parent = self.head
+        child = parent.next
+        transactions = size
+        while child:
+            if child.prev_hash == 0:
+                print("Transactions in blockchain: " + transactions + "\nState of blockchain: ERROR\n" + Bad block)
+            struct_parameters = '32s d 16s I 12s I ' + str(parent.data_length) + 's'
+            packed_struct = struct.pack(struct_parameters,
+                                        bytes(parent.prev_hash,
+                                              encoding='utf-8'),
+                                        maya.parse(str(parent.time_stamp)).datetime().timestamp(),
+                                        bytes(parent.case_id, encoding='utf-8'),
+                                        int(parent.item_id),
+                                        bytes(parent.state, encoding='utf-8'),
+                                        int(parent.data_length), bytes(parent.data, encoding='utf-8'))
+            checksum_verification = hashlib.sha256(packed_struct).hexdigest()
+            if child.prev_hash != checksum_verification:
+                bchoc_state = "ERROR"
+                reason = "Block contents do not match block checksum."
+            else:
+                bchoc_state = "CLEAN"
+                reason = ""
+"""
 
 def main():
     blockchain = Blockchain()
